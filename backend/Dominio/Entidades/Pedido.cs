@@ -36,7 +36,7 @@ namespace Dominio.Entidades
         {
             ValidarItem(item);
 
-            var pedidoItem = new PedidoItem(item.Id, item.Nome, item.Categoria, item.Preco);
+            var pedidoItem = new PedidoItem(Id, item.Id, item.Nome, item.Categoria, item.Preco);
             Itens.Add(pedidoItem);
             RecalcularTotais();
 

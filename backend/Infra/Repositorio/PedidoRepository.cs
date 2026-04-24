@@ -54,7 +54,7 @@ namespace Infra.Repositorio
                 Itens = p.Itens.Select(i => new PedidoItemDto
                 {
                     ItemId = i.ItemId,
-                    ItemNome = i.ItemNome,
+                    ItemNome = i.Nome,
                     Categoria = i.Categoria,
                     PrecoUnitario = i.PrecoUnitario,
                     Quantidade = i.Quantidade

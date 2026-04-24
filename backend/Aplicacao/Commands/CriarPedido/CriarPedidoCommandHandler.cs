@@ -73,7 +73,7 @@ namespace Aplicacao.Commands.CriarPedido
                 Itens = pedido.Itens.Select(i => new PedidoItemDto
                 {
                     ItemId = i.ItemId,
-                    ItemNome = i.ItemNome,
+                    ItemNome = i.Nome,
                     Categoria = i.Categoria.ToString(),
                     PrecoUnitario = i.PrecoUnitario
                 }).ToList()

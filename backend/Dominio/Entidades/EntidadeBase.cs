@@ -7,6 +7,7 @@ namespace Dominio.Entidades
 {
     public class EntidadeBase
     {
+        public Guid Id { get; protected set; }
 
         [NotMapped]
         private readonly List<EventoBase> _domainEvents = [];

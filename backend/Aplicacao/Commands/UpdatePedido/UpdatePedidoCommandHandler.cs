@@ -81,7 +81,7 @@ namespace Aplicacao.Commands.UpdatePedido
                 Itens = pedido.Itens.Select(i => new Dominio.Dtos.PedidoItemDto
                 {
                     ItemId = i.ItemId,
-                    ItemNome = i.ItemNome,
+                    ItemNome = i.Nome,
                     Categoria = i.Categoria,
                     PrecoUnitario = i.PrecoUnitario,
                     Quantidade = i.Quantidade

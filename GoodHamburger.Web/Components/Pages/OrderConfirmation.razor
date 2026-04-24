@@ -39,17 +39,17 @@
                 <div class="order-header">
                     <div class="order-id">
                         <span class="label">Número do Pedido:</span>
-                        <span class="value">@order.Id.ToString().ToUpper()</span>
+                        <span class="value">@order.Pedido?.Id.ToString().ToUpper()</span>
                     </div>
                     <div class="order-date">
                         <i class="bi bi-calendar"></i>
-                        <span>@order.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
+                        <span>@order.Pedido?.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
                     </div>
                 </div>
 
                 <div class="order-items">
                     <h3>Itens do Pedido</h3>
-                    @foreach (var item in order.Itens)
+                    @foreach (var item in order.Pedido?.Itens ?? Enumerable.Empty<PedidoItemDto>())
                     {
                         <div class="order-item">
                             <div class="item-info">
@@ -67,19 +67,19 @@
                 <div class="order-totals">
                     <div class="total-row">
                         <span>Subtotal</span>
-                        <span>@order.Subtotal.ToString("C2")</span>
+                        <span>@order.Pedido?.Subtotal.ToString("C2")</span>
                     </div>
-                    @if (order.Desconto > 0)
+                    @if (order.Pedido?.Desconto > 0)
                     {
                         <div class="total-row discount">
                             <span>Desconto</span>
-                            <span>- @order.Desconto.ToString("C2")</span>
+                            <span>- @order.Pedido?.Desconto.ToString("C2")</span>
                         </div>
                     }
                     <div class="total-row divider"></div>
                     <div class="total-row final">
                         <span>Total</span>
-                        <span class="total-amount">@order.Total.ToString("C2")</span>
+                        <span class="total-amount">@order.Pedido?.Total.ToString("C2")</span>
                     </div>
                 </div>
 

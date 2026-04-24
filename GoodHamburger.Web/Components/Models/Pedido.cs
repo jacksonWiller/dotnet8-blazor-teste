@@ -25,6 +25,12 @@ public class PedidoItemDto
 
 public class PedidoResponse
 {
+    [JsonPropertyName("pedido")]
+    public PedidoDetalhes? Pedido { get; set; }
+}
+
+public class PedidoDetalhes
+{
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
     

@@ -57,10 +57,10 @@ public class OrderService : IOrderService
     /// <summary>
     /// Obtém um pedido pelo ID
     /// </summary>
-    public async Task<PedidoResponse?> GetOrderByIdAsync(Guid orderId)
+    public async Task<PedidoResponse?> IOrderService.GetOrderByIdAsync(Guid orderId)
     {
         var response = await _httpClient.GetFromJsonAsync<ApiResponse<PedidoResponse>>($"api/Pedidos/{orderId}");
-        return response?.Result;
+        return response?.Result?.Pedido;
     }
     
     /// <summary>
@@ -73,4 +73,9 @@ public class OrderService : IOrderService
         
         return response?.Result ?? new PagedPedidoResponse();
     }
+
+    //Task<PedidoResponse?> IOrderService.GetOrderByIdAsync(Guid orderId)
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

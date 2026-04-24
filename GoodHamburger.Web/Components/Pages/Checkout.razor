@@ -31,14 +31,14 @@
             <h2>Pedido Criado com Sucesso!</h2>
             <p>Obrigado pela sua compra!</p>
             <div class="order-details">
-                <p><strong>ID do Pedido:</strong> @orderResponse?.Id.ToString().ToUpper()</p>
-                <p><strong>Total:</strong> @orderResponse?.Total.ToString("C2")</p>
+                <p><strong>ID do Pedido:</strong> @orderResponse?.Pedido?.Id.ToString().ToUpper()</p>
+                <p><strong>Total:</strong> @orderResponse?.Pedido?.Total.ToString("C2")</p>
             </div>
             <button @onclick="NavigateToHome" class="btn btn-primary">
                 <i class="bi bi-burger"></i> Fazer Novo Pedido
             </button>
         </div>
-    }
+    }   
     else if (CartService.Items.Any() == false)
     {
         <div class="empty-cart">

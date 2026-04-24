@@ -7,12 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="11.11.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+    <Compile Remove="Validacoes\**" />
+    <EmbeddedResource Remove="Validacoes\**" />
+    <None Remove="Validacoes\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Validacoes\" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
   </ItemGroup>
 
 </Project>

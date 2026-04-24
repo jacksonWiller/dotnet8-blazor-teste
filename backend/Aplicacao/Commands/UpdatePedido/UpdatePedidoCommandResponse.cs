@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using Dominio.Dtos;
 
 namespace Aplicacao.Commands.UpdatePedido
 {

@@ -17,9 +17,11 @@ namespace Dominio.Dtos
     public class PedidoItemDto
     {
         public Guid ItemId { get; set; }
-        public string Nome { get; set; }
+        public string ItemNome { get; set; }
         public string Categoria { get; set; }
         public decimal PrecoUnitario { get; set; }
+        public int Quantidade { get; set; }
+        public decimal Subtotal => PrecoUnitario * Quantidade;
     }
 
     /// <summary>

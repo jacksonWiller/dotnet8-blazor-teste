@@ -39,7 +39,7 @@ namespace Aplicacao.Queries.GetPedidoById
                 {
                     ItemId = i.ItemId,
                     ItemNome = i.ItemNome,
-                    Categoria = (int)i.Categoria,
+                    Categoria = i.Categoria,
                     PrecoUnitario = i.PrecoUnitario,
                     Quantidade = i.Quantidade
                 }).ToList(),

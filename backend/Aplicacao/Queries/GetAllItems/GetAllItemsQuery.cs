@@ -1,8 +1,7 @@
-using Aplicacao.Queries.GetAllItems;
 using Ardalis.Result;
 using MediatR;
 
-namespace Clientes.Aplicacao.Queries.GetAllItems;
+namespace Aplicacao.Queries.GetAllItems;
 
 /// <summary>
 /// Query para obter todos os itens do menu com paginação

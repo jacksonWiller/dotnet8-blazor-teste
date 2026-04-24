@@ -1,6 +1,6 @@
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
-using Clientes.Dominio.Interfaces;
+using Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
 

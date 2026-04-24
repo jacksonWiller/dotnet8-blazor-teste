@@ -33,21 +33,21 @@ namespace Aplicacao.Commands.CriarPedido
             }
 
             // Criar pedido
-            var pedido = new Dominio.Entidades.Pedido();
+            var pedido = new Pedido();
 
             // Adicionar itens ao pedido
             foreach (var itemId in request.ItensIds)
             {
-                var itemCardapio = Item.GetAllItens().FirstOrDefault(i => i.Id == itemId);
+                var item = CardapioFixo.GetAllItens().FirstOrDefault(i => i.Id == itemId);
                 
-                if (itemCardapio == null)
+                if (item == null)
                 {
                     return Result<CriarPedidoCommandResponse>.NotFound($"Item com ID {itemId} não encontrado no cardápio.");
                 }
 
                 try
                 {
-                    pedido.AdicionarItem(itemCardapio);
+                    pedido.AdicionarItem(item);
                 }
                 catch (ArgumentException ex)
                 {

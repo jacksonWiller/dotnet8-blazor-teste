@@ -53,7 +53,7 @@ public class PedidoDetalhes
 public class PagedPedidoResponse
 {
     [JsonPropertyName("pedidos")]
-    public List<PedidoResponse> Pedidos { get; set; } = new();
+    public List<PedidoDetalhes> Pedidos { get; set; } = new();
     
     [JsonPropertyName("totalCount")]
     public int TotalCount { get; set; }

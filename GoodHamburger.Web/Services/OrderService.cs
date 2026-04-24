@@ -9,7 +9,7 @@ namespace GoodHamburger.Web.Services;
 public interface IOrderService
 {
     Task<PedidoResponse> CreateOrderAsync(List<Guid> itemIds);
-    Task<PedidoResponse?> GetOrderByIdAsync(Guid orderId);
+    Task<PedidoDetalhes?> GetOrderByIdAsync(Guid orderId);
     Task<PagedPedidoResponse> GetAllOrdersAsync(int pageNumber = 1, int pageSize = 10);
 }
 
@@ -57,7 +57,7 @@ public class OrderService : IOrderService
     /// <summary>
     /// Obtém um pedido pelo ID
     /// </summary>
-    public async Task<PedidoResponse?> IOrderService.GetOrderByIdAsync(Guid orderId)
+    public async Task<PedidoDetalhes?> GetOrderByIdAsync(Guid orderId)
     {
         var response = await _httpClient.GetFromJsonAsync<ApiResponse<PedidoResponse>>($"api/Pedidos/{orderId}");
         return response?.Result?.Pedido;

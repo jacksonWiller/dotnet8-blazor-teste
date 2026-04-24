@@ -538,24 +538,6 @@ body {
     box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
 }
 
-.floating-btn-2 {
-    position: fixed;
-    float: inline-end;
-    bottom: 32px;
-    right: 32px;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    text-decoration: none;
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
-    transition: all 0.3s ease;
-    z-index: 1000;
-}
 
 /* Floating Button */
 .floating-btn {

@@ -3,6 +3,7 @@
 @using GoodHamburger.Web.Services
 @inject NavigationManager Navigation
 @inject ICartService CartService
+@inject IOrderService OrderService
 @rendermode InteractiveServer
 
 <div class="cart-page">
@@ -109,6 +110,36 @@
         CartService.OnChange += StateHasChanged;
     }
 
+    private async Task ProceedToCheckout()
+    {
+        try
+        {
+            // Extrair os IDs dos itens do carrinho
+            var itemIds = CartService.Items.Select(i => i.ItemId).ToList();
+            
+            if (!itemIds.Any())
+            {
+                return;
+            }
+            
+            // Criar o pedido no backend
+            await OrderService.CreateOrderAsync(itemIds);
+            
+            // Limpar o carrinho após criar o pedido
+            await CartService.ClearCartAsync();
+            
+            // Redirecionar para a página de sucesso
+            Navigation.NavigateTo("/checkout/success");
+        }
+        catch (Exception ex)
+        {
+            // Tratar erro
+            System.Diagnostics.Debug.WriteLine($"Erro ao criar pedido: {ex.Message}");
+            // Aqui você pode implementar um sistema de notificação/toast
+            // Por enquanto, apenas exibe no console
+        }
+    }
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -138,11 +169,6 @@
     private async Task RemoveItemAsync(Guid itemId)
     {
         await CartService.RemoveItemAsync(itemId);
-    }
-
-    private async Task ProceedToCheckout()
-    {
-        Navigation.NavigateTo("/checkout");
     }
 
     private void NavigateToHome()

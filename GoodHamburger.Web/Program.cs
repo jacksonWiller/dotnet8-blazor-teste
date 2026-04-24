@@ -13,9 +13,13 @@ builder.Services.AddHttpClient<IItemService, ItemService>(client =>
     client.BaseAddress = new Uri("https://localhost:7113/");
 });
 
-// Register Cart and Order services
+builder.Services.AddHttpClient<IOrderService, OrderService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7113/");
+});
+
+// Register Cart service
 builder.Services.AddScoped<ICartService, CartService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
 
 var app = builder.Build();
 

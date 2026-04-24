@@ -1,15 +1,4 @@
-﻿-- =========================================
--- LIMPEZA DOS DADOS
--- =========================================
-
-DELETE FROM "Iten";
-DELETE FROM "Pedido";
-DELETE FROM "PedidoItens";
-
--- =========================================
--- TABELAS
--- =========================================
-
+﻿
 -- =========================================
 -- TABELA: PEDIDOS
 -- =========================================
@@ -19,33 +8,33 @@ CREATE TABLE IF NOT EXISTS "Pedido" (
     "Desconto" decimal(18,2) NOT NULL,
     "Total" decimal(18,2) NOT NULL,
     "DataCriacao" timestamp with time zone NOT NULL,
-    CONSTRAINT "PK_Pedidos" PRIMARY KEY ("Id")
+    CONSTRAINT "PK_Pedido" PRIMARY KEY ("Id")
 );
 
-CREATE INDEX IF NOT EXISTS "IX_Pedidos_DataCriacao" ON "Pedido" ("DataCriacao");
+CREATE INDEX IF NOT EXISTS "IX_Pedido_DataCriacao" ON "Pedido" ("DataCriacao");
 
 -- =========================================
 -- TABELA: PEDIDO_ITENS
 -- =========================================
-CREATE TABLE IF NOT EXISTS "PedidoIten" (
+CREATE TABLE IF NOT EXISTS "PedidoItem" (
     "Id" uuid NOT NULL,
     "PedidoId" uuid NOT NULL,
     "ItemId" uuid NOT NULL,
     "Nome" text NOT NULL,
     "Categoria" integer NOT NULL,
     "PrecoUnitario" decimal(18,2) NOT NULL,
-    CONSTRAINT "PK_PedidoItens" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_PedidoItens_Pedidos_PedidoId" FOREIGN KEY ("PedidoId") REFERENCES "Pedidos" ("Id") ON DELETE CASCADE
+    CONSTRAINT "PK_PedidoItem" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_PedidoItem_Pedido_PedidoId" FOREIGN KEY ("PedidoId") REFERENCES "Pedido" ("Id") ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS "IX_PedidoItens_PedidoId" ON "PedidoItens" ("PedidoId");
-CREATE INDEX IF NOT EXISTS "IX_PedidoItens_ItemId" ON "PedidoItens" ("ItemId");
+CREATE INDEX IF NOT EXISTS "IX_PedidoItem_PedidoId" ON "PedidoItem" ("PedidoId");
+CREATE INDEX IF NOT EXISTS "IX_PedidoItem_ItemId" ON "PedidoItem" ("ItemId");
 
 
 -- =========================================
 -- TABELA: ITENS
 -- =========================================
-CREATE TABLE IF NOT EXISTS "Iten" (
+CREATE TABLE IF NOT EXISTS "Item" (
     "Id" uuid NOT NULL,
     "Nome" text NOT NULL,
     "Descricao" text NOT NULL,
@@ -57,17 +46,17 @@ CREATE TABLE IF NOT EXISTS "Iten" (
     CONSTRAINT "PK_Itens" PRIMARY KEY ("Id")
 );
 
-CREATE INDEX IF NOT EXISTS "IX_Itens_Tipo" ON "Iten" ("Tipo");
-CREATE INDEX IF NOT EXISTS "IX_Itens_Categoria" ON "Iten" ("Categoria");
+CREATE INDEX IF NOT EXISTS "IX_Itens_Tipo" ON "Item" ("Tipo");
+CREATE INDEX IF NOT EXISTS "IX_Itens_Categoria" ON "Item" ("Categoria");
 
 -- =========================================
 -- DADOS: ITENS
 -- =========================================
-INSERT INTO "Iten" ("Id", "Nome", "Descricao", "Preco", "Tipo", "Categoria", "UrlImagem", "Ativo")
+INSERT INTO "Item" ("Id", "Nome", "Descricao", "Preco", "Tipo", "Categoria", "UrlImagem", "Removido")
 VALUES
   -- Hamburgueres
   (
-    'a1a1a1a1-b1b1-c1c1-d1d1-e1e1e1e1e1e1',
+    gen_random_uuid(),
     'X-Burger',
     'Hambúrguer de 180g, queijo cheddar, alface, tomate e molho especial',
     25.90,
@@ -77,7 +66,7 @@ VALUES
     TRUE
   ),
   (
-    'a2a2a2a2-b2b2-c2c2-d2d2-e2e2e2e2e2e2',
+    gen_random_uuid(),
     'X Egg',
     'Hambúrguer de 180g, queijo cheddar, bacon crocante, cebola caramelizada e BBQ',
     29.90,
@@ -87,7 +76,7 @@ VALUES
     TRUE
   ),
   (
-    'a3a3a3a3-b3b3-c3c3-d3d3-e3e3e3e3e3e3',
+    gen_random_uuid(),
     'X Bacon',
     'Hambúrguer de 200g, queijo prato, alface americana, tomate italiano e maionese da casa',
     27.50,
@@ -99,25 +88,24 @@ VALUES
   
   -- Acompanhamentos
   (
-    newid(),
+    gen_random_uuid(),  
     'Batata frita',
     'Porção de 300g de batatas fritas crocantes com sal',
     15.90,
     'Batata frita',
     'Acompanhamento',
     'https://example.com/images/batata-frita.jpg',
-    TRUE
+    FALSE
   ),
   
   -- Bebidas
   (
-    newid(),
+    gen_random_uuid(),
     'Refrigerante',
     'Lata 350ml bem geladinha',
     2.50,
     'Refrigerante',
     'Acompanhamento',
     'https://example.com/images/coca-cola.jpg',
-    TRUE
+    FALSE
   );
-

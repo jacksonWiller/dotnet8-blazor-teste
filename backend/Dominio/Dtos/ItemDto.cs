@@ -43,6 +43,6 @@ namespace Dominio.Dtos
         /// <summary>
         /// Indica se o item está ativo no menu
         /// </summary>
-        public bool Ativo { get; set; }
+        public bool Removido { get; set; }
     }
 }

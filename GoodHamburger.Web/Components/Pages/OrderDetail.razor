@@ -1,0 +1,287 @@
+@page "/orders/{OrderId:int}"
+@page "/order-detail/{OrderId:int}"
+@inject NavigationManager Navigation
+@inject IJSRuntime Js
+@rendermode InteractiveServer
+
+@if (order is null)
+{
+    <div class="order-detail-page">
+        <div class="order-detail-header">
+            <div class="order-detail-title">
+                <h1>Pedido nao encontrado</h1>
+                <p class="order-detail-subtitle">ID: #@OrderId</p>
+            </div>
+            <div class="order-detail-actions">
+                <button class="btn-filter" type="button" @onclick='() => Navigation.NavigateTo("/orders")'>
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="order-detail-page">
+        <div class="order-detail-header">
+            <div class="order-detail-title">
+                <h1>Pedido #@order.OrderId</h1>
+                <p class="order-detail-subtitle">@order.CustomerName • @order.Time</p>
+            </div>
+
+            <div class="order-detail-actions">
+                <button class="btn-filter" type="button" @onclick='() => Navigation.NavigateTo("/orders")'>
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </button>
+                <button class="btn-filter" type="button" @onclick="EditOrder">
+                    <i class="bi bi-pencil"></i> Editar
+                </button>
+                <button class="btn-filter btn-filter-danger" type="button" @onclick="CancelOrderAsync">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+            </div>
+        </div>
+
+        <div class="order-detail-status">
+            <div class="order-detail-status-top">
+                <span class="status-badge status-@order.Status">@StatusLabel(order.Status)</span>
+                <div class="order-detail-arrival">
+                    Chegando em <strong>@arrivalMinutes</strong> min
+                </div>
+            </div>
+            <div class="order-detail-timeline">
+                @foreach (var step in BuildTimeline(order.Status))
+                {
+                    <div class="order-detail-step @step.CssClass">
+                        <div class="order-detail-step-dot"></div>
+                        <div class="order-detail-step-text">@step.Text</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="order-detail-grid">
+            <section class="order-detail-items">
+                <h2 class="order-detail-section-title">Itens</h2>
+                @foreach (var item in order.Items)
+                {
+                    <article class="order-detail-item">
+                        <div class="order-detail-item-icon">
+                            <i class="bi bi-@item.Icon"></i>
+                        </div>
+                        <div class="order-detail-item-info">
+                            <div class="order-detail-item-name">@item.Name</div>
+                            <div class="order-detail-item-desc">@item.Description</div>
+                            <div class="order-detail-item-meta">Qtd: @item.Quantity</div>
+                        </div>
+                        <div class="order-detail-item-price">@item.Price.ToString("C2")</div>
+                    </article>
+                }
+            </section>
+
+            <aside class="order-detail-summary">
+                <h2 class="order-detail-section-title">Resumo</h2>
+                <div class="order-detail-summary-row">
+                    <span>Subtotal</span>
+                    <span><strong>@subtotal.ToString("C2")</strong></span>
+                </div>
+                @if (discount > 0)
+                {
+                    <div class="order-detail-summary-row discount">
+                        <span><i class="bi bi-tag"></i> Desconto</span>
+                        <span>- @discount.ToString("C2")</span>
+                    </div>
+                }
+                <div class="order-detail-summary-row">
+                    <span>Taxa de entrega</span>
+                    <span><strong>@deliveryFee.ToString("C2")</strong></span>
+                </div>
+                <div class="divider"></div>
+                <div class="order-detail-total">
+                    <span>Total</span>
+                    <span class="order-detail-total-amount">@total.ToString("C2")</span>
+                </div>
+
+                <div class="order-detail-summary-actions">
+                    <button class="add-btn" type="button" @onclick="TrackOrder">
+                        <i class="bi bi-truck"></i> Rastrear
+                    </button>
+                    <button class="btn-filter" type="button" @onclick="DownloadReceipt">
+                        <i class="bi bi-download"></i> Recibo
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int OrderId { get; set; }
+
+    private OrderDetailData? order;
+
+    private int arrivalMinutes = 12;
+    private decimal deliveryFee = 3.50m;
+    private decimal discount = 0;
+    private decimal subtotal = 0;
+    private decimal total = 0;
+
+    protected override void OnParametersSet()
+    {
+        order = BuildOrders().FirstOrDefault(o => o.OrderId == OrderId);
+        RecalculateTotals();
+    }
+
+    private void RecalculateTotals()
+    {
+        if (order is null)
+        {
+            subtotal = 0;
+            discount = 0;
+            total = 0;
+            return;
+        }
+
+        subtotal = order.Items.Sum(i => i.Price * i.Quantity);
+        discount = 0;
+        total = subtotal - discount + deliveryFee;
+    }
+
+    private void EditOrder()
+    {
+        // Placeholder: wire into a real edit screen when available.
+        Navigation.NavigateTo("/orders");
+    }
+
+    private async Task CancelOrderAsync()
+    {
+        var confirmed = await Js.InvokeAsync<bool>("confirm", $"Tem certeza que deseja cancelar o pedido #{OrderId}?");
+        if (confirmed)
+        {
+            Navigation.NavigateTo("/orders");
+        }
+    }
+
+    private void TrackOrder()
+    {
+        // Placeholder: wire into a real tracking screen when available.
+        Navigation.NavigateTo("/orders");
+    }
+
+    private void DownloadReceipt()
+    {
+        // Placeholder: implement via JS interop / API when available.
+    }
+
+    private static string StatusLabel(string status) => status switch
+    {
+        "pending" => "Pendente",
+        "cooking" => "Preparando",
+        "ready" => "Pronto",
+        "completed" => "Concluido",
+        _ => status
+    };
+
+    private static List<TimelineStep> BuildTimeline(string status)
+    {
+        var steps = new List<TimelineStep>
+        {
+            new("Confirmado"),
+            new("Preparando"),
+            new("Pronto"),
+            new("Concluido")
+        };
+
+        var activeIndex = status switch
+        {
+            "pending" => 0,
+            "cooking" => 1,
+            "ready" => 2,
+            "completed" => 3,
+            _ => 0
+        };
+
+        for (var i = 0; i < steps.Count; i++)
+        {
+            if (i < activeIndex) steps[i].CssClass = "done";
+            if (i == activeIndex) steps[i].CssClass = "active";
+        }
+
+        return steps;
+    }
+
+    private static List<OrderDetailData> BuildOrders()
+    {
+        return new()
+        {
+            new OrderDetailData
+            {
+                OrderId = 1001,
+                CustomerName = "John Doe",
+                Status = "pending",
+                Time = "10:23 AM",
+                Items = new()
+                {
+                    new OrderLineItem("The OG Classic", "Prime beef patty, cheddar, pickles, onion.", "burger", 12.90m, 1),
+                    new OrderLineItem("Truffle Fries", "Rosemary + parmesan dust.", "cup-straw", 6.50m, 1),
+                    new OrderLineItem("Citrus Mist", "Sparkling lemon-lime infusion.", "cup-hot-fill", 4.50m, 1),
+                }
+            },
+            new OrderDetailData
+            {
+                OrderId = 1002,
+                CustomerName = "Jane Smith",
+                Status = "cooking",
+                Time = "10:15 AM",
+                Items = new()
+                {
+                    new OrderLineItem("Spicy Buffalo", "Buttermilk fried chicken, buffalo sauce.", "dish-fill", 11.50m, 1),
+                    new OrderLineItem("Colossal Rings", "Giant sweet onions, beer batter.", "circle-half", 5.90m, 1),
+                }
+            },
+            new OrderDetailData
+            {
+                OrderId = 1003,
+                CustomerName = "Mike Johnson",
+                Status = "ready",
+                Time = "09:58 AM",
+                Items = new()
+                {
+                    new OrderLineItem("The Green Garden", "Beet + quinoa patty, avocado.", "emoji-smile", 13.50m, 1),
+                    new OrderLineItem("Zesty Slaw", "Cabbage with cider vinegar dressing.", "emoji-dizzy", 3.50m, 1),
+                    new OrderLineItem("Choco-Fudge Shake", "Dark chocolate with fudge chunks.", "cup-hot-fill", 7.20m, 1),
+                }
+            },
+            new OrderDetailData
+            {
+                OrderId = 1004,
+                CustomerName = "Sarah Williams",
+                Status = "completed",
+                Time = "09:45 AM",
+                Items = new()
+                {
+                    new OrderLineItem("The OG Classic", "Prime beef patty, cheddar, pickles, onion.", "burger", 12.90m, 1),
+                    new OrderLineItem("Truffle Fries", "Rosemary + parmesan dust.", "cup-straw", 6.50m, 1),
+                }
+            }
+        };
+    }
+
+    private sealed class OrderDetailData
+    {
+        public int OrderId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public string Status { get; set; } = "pending";
+        public string Time { get; set; } = string.Empty;
+        public List<OrderLineItem> Items { get; set; } = new();
+    }
+
+    private sealed record OrderLineItem(string Name, string Description, string Icon, decimal Price, int Quantity);
+
+    private sealed class TimelineStep
+    {
+        public TimelineStep(string text) => Text = text;
+        public string Text { get; }
+        public string CssClass { get; set; } = string.Empty;
+    }
+}

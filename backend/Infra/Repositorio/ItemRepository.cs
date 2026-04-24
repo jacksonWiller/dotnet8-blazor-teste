@@ -58,7 +58,7 @@ namespace Infra.Repositorio
                 Tipo = i.Tipo,
                 Categoria = i.Categoria,
                 UrlImagem = i.UrlImagem,
-                Ativo = i.Removido
+                Removido = i.Removido
             }).ToList();
 
             return (itensListaDto, totalRecords);

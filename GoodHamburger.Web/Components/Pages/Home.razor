@@ -1,0 +1,162 @@
+@page "/"
+@using GoodHamburger.Web.Components.Models
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<section class="hero">
+    <div class="hero-card">
+        <div class="hero-content">
+            <span class="badge">Daily Special</span>
+            <h1>The Truffle<br>Masterpiece</h1>
+            <p>Wagyu beef, black truffle aioli, aged swiss, and sautéed wild mushrooms on a toasted brioche bun.</p>
+        </div>
+        <div class="hero-footer">
+            <span class="price-lg">$18.50</span>
+            <button class="btn-light">Order Now</button>
+        </div>
+    </div>
+
+    <div class="deal-card">
+        <h2>Spicy Weekend Deal</h2>
+        <p>Get 2 Fire-Grilled Jalapeño Burgers for the price of 1. Limited time only!</p>
+        <div class="save">SAVE 50%</div>
+        <button class="btn-light">CLAIM DEAL</button>
+    </div>
+</section>
+
+<div class="filter-row">
+    <div class="categories">
+        <div class="category active">
+            <span class="cat-icon"><i class="bi bi-burger"></i></span>
+            Sandwiches
+        </div>
+        <div class="category">
+            <span class="cat-icon"><i class="bi bi-plate-fill"></i></span>
+            Sides
+        </div>
+        <div class="category">
+            <span class="cat-icon"><i class="bi bi-cup-hot-fill"></i></span>
+            Drinks
+        </div>
+        <div class="category">
+            <span class="cat-icon"><i class="bi bi-ice-cream"></i></span>
+            Desserts
+        </div>
+    </div>
+    <a class="filters-link" href="#">
+        <span class="filter-icon"><i class="bi bi-list"></i></span>
+        Filters
+    </a>
+</div>
+
+<section class="products">
+    @foreach (var product in products)
+    {
+        <article class="card">
+            <div class="card-image">
+                @if (!string.IsNullOrEmpty(product.Tag))
+                {
+                    <span class="tag @product.TagClass">@product.Tag</span>
+                }
+                <i class="bi bi-@product.Icon"></i>
+                <div class="fav">
+                    <i class="bi bi-heart"></i>
+                </div>
+            </div>
+            <div class="card-body">
+                <h3>@product.Name</h3>
+                <p>@product.Description</p>
+                <div class="card-footer">
+                    <span class="price">@product.Price</span>
+                    <button class="add-btn">
+                        <i class="bi bi-cart-plus"></i> Add
+                    </button>
+                </div>
+            </div>
+        </article>
+    }
+</section>
+
+<a class="floating-btn" href="#menu">🍴</a>
+
+@code {
+    private List<Product> products = new()
+    {
+        new()
+        {
+            Name = "The OG Classic",
+            Description = "Prime beef patty, melted cheddar, pickles, onion, and our signature burger sauce.",
+            Price = "$12.90",
+            Icon = "burger",
+            Tag = "Bestseller",
+            TagClass = ""
+        },
+        new()
+        {
+            Name = "Spicy Buffalo",
+            Description = "Buttermilk fried chicken, house buffalo sauce, ranch slaw, and jalapeños.",
+            Price = "$11.50",
+            Icon = "dish-fill",
+            TagClass = "orange"
+        },
+        new()
+        {
+            Name = "Truffle Fries",
+            Description = "Hand-cut fries tossed in white truffle oil, rosemary, and parmesan dust.",
+            Price = "$6.50",
+            Icon = "cup-straw",
+            Tag = "New",
+            TagClass = "brown"
+        },
+        new()
+        {
+            Name = "Colossal Rings",
+            Description = "Giant sweet onions, double-dipped in our beer batter and fried to perfection.",
+            Price = "$5.90",
+            Icon = "circle-half"
+        },
+        new()
+        {
+            Name = "Choco-Fudge Shake",
+            Description = "Velvety dark chocolate ice cream blended with homemade fudge chunks.",
+            Price = "$7.20",
+            Icon = "cup-hot-fill",
+            TagClass = "black"
+        },
+        new()
+        {
+            Name = "The Green Garden",
+            Description = "Roasted beet and quinoa patty, smashed avocado, and herb vegan mayo.",
+            Price = "$13.50",
+            Icon = "emoji-smile",
+            Tag = "Vegan",
+            TagClass = "green"
+        },
+        new()
+        {
+            Name = "Citrus Mist",
+            Description = "Sparkling lemon-lime infusion with a hint of fresh garden mint.",
+            Price = "$4.50",
+            Icon = "emoji-laughing",
+            TagClass = "teal"
+        },
+        new()
+        {
+            Name = "Zesty Slaw",
+            Description = "Red and green cabbage with our secret apple cider vinegar dressing.",
+            Price = "$3.50",
+            Icon = "emoji-dizzy",
+            TagClass = "black"
+        }
+    };
+
+    public class Product
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Price { get; set; } = string.Empty;
+        public string Icon { get; set; } = string.Empty;
+        public string? Tag { get; set; }
+        public string TagClass { get; set; } = string.Empty;
+    }
+}

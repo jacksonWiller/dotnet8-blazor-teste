@@ -1,0 +1,194 @@
+@page "/cart"
+@using GoodHamburger.Web.Components.Models
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<div class="cart-page">
+    <div class="cart-header">
+        <h1>🛒 Seu Carrinho</h1>
+        <a class="continue-shopping" href="/">Continuar comprando</a>
+    </div>
+
+    @if (cartItems.Any())
+    {
+        <div class="cart-content">
+            <div class="cart-items">
+                @foreach (var item in cartItems)
+                {
+                    <article class="cart-item">
+                        <div class="cart-item-image">
+                            <i class="bi bi-@item.Icon"></i>
+                        </div>
+                        <div class="cart-item-details">
+                            <h3>@item.Name</h3>
+                            <p>@item.Description</p>
+                            <div class="quantity-control">
+                                <button class="qty-btn" @onclick="() => DecreaseQuantity(item.Id)">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                <span class="qty-value">@item.Quantity</span>
+                                <button class="qty-btn" @onclick="() => IncreaseQuantity(item.Id)">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cart-item-price">
+                            <span class="price">@item.Price.ToString("C2")</span>
+                            <button class="remove-btn" @onclick="() => RemoveItem(item.Id)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </article>
+                }
+            </div>
+
+            <aside class="cart-summary">
+                <div class="summary-header">
+                    <h2>Resumo do Pedido</h2>
+                </div>
+                <div class="summary-body">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span><strong>@subtotal.ToString("C2")</strong></span>
+                    </div>
+                    @if (discount > 0)
+                    {
+                        <div class="summary-row discount">
+                            <span><i class="bi bi-tag"></i> Desconto</span>
+                            <span>- @discount.ToString("C2")</span>
+                        </div>
+                    }
+                    <div class="summary-row">
+                        <span>Taxa de Entrega</span>
+                        <span><strong>@deliveryFee.ToString("C2")</strong></span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="total-row">
+                        <span>Total</span>
+                        <span class="total-amount">@total.ToString("C2")</span>
+                    </div>
+                    <div class="delivery-estimate">
+                        <i class="bi bi-clock"></i> Entrega estimada: 25-35 min
+                    </div>
+                    <button class="checkout-btn" @onclick="ProceedToCheckout">
+                        Confirmar Pedido <i class="bi bi-arrow-right"></i>
+                    </button>
+                    <p class="terms">Ao clicar em confirmar, você concorda com nossos Termos de Serviço.</p>
+                </div>
+            </aside>
+        </div>
+    }
+    else
+    {
+        <div class="empty-cart">
+            <div class="empty-icon">
+                <i class="bi bi-cart-x"></i>
+            </div>
+            <h2>Seu carrinho está vazio</h2>
+            <p>Adicione alguns itens deliciosos ao seu carrinho!</p>
+            <button class="shop-now-btn" @onclick="NavigateToHome">
+                <i class="bi bi-burger"></i> Fazer Pedido
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private List<CartItem> cartItems = new();
+    private decimal subtotal = 0;
+    private decimal discount = 0;
+    private decimal deliveryFee = 3.50m;
+    private decimal total = 0;
+
+    protected override void OnInitialized()
+    {
+        LoadCartFromSession();
+        CalculateTotals();
+    }
+
+    private void LoadCartFromSession()
+    {
+        // Simulação de carrinho - em produção, usar localStorage ou API
+        cartItems = new List<CartItem>
+        {
+            new()
+            {
+                Id = 1,
+                Name = "Double Cheese Melt",
+                Description = "2x Wagyu Beef, Triple Cheddar, Caramelized Onions",
+                Price = 18.50m,
+                Quantity = 2,
+                Icon = "burger"
+            },
+            new()
+            {
+                Id = 2,
+                Name = "Bacon BBQ Combo",
+                Description = "Includes Large Fries & Craft Soda",
+                Price = 22.00m,
+                Quantity = 1,
+                IsComboDeal = true,
+                Icon = "cup-straw"
+            }
+        };
+    }
+
+    private void CalculateTotals()
+    {
+        subtotal = cartItems.Sum(item => item.Price * item.Quantity);
+        
+        // Desconto para combo deals (20%)
+        var comboItems = cartItems.Where(item => item.IsComboDeal).ToList();
+        if (comboItems.Count >= 2)
+        {
+            discount = subtotal * 0.20m;
+        }
+        
+        total = subtotal - discount + deliveryFee;
+    }
+
+    private void IncreaseQuantity(int itemId)
+    {
+        var item = cartItems.FirstOrDefault(i => i.Id == itemId);
+        if (item != null)
+        {
+            item.Quantity++;
+            CalculateTotals();
+            SaveCartToSession();
+        }
+    }
+
+    private void DecreaseQuantity(int itemId)
+    {
+        var item = cartItems.FirstOrDefault(i => i.Id == itemId);
+        if (item != null && item.Quantity > 1)
+        {
+            item.Quantity--;
+            CalculateTotals();
+            SaveCartToSession();
+        }
+    }
+
+    private void RemoveItem(int itemId)
+    {
+        cartItems.RemoveAll(i => i.Id == itemId);
+        CalculateTotals();
+        SaveCartToSession();
+    }
+
+    private void SaveCartToSession()
+    {
+        // Em produção, salvar no localStorage ou enviar para API
+        // Implementação real seria via IJSRuntime
+    }
+
+    private void ProceedToCheckout()
+    {
+        Navigation.NavigateTo("/checkout");
+    }
+
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

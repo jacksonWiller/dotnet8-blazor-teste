@@ -8,9 +8,9 @@ namespace GoodHamburger.Web.Services;
 /// </summary>
 public interface IOrderService
 {
-    Task<OrderResponse> CreateOrderAsync(List<Guid> itemIds);
-    Task<OrderResponse?> GetOrderByIdAsync(Guid orderId);
-    Task<PagedOrderResponse> GetAllOrdersAsync(int pageNumber = 1, int pageSize = 10);
+    Task<PedidoResponse> CreateOrderAsync(List<Guid> itemIds);
+    Task<PedidoResponse?> GetOrderByIdAsync(Guid orderId);
+    Task<PagedPedidoResponse> GetAllOrdersAsync(int pageNumber = 1, int pageSize = 10);
 }
 
 public class OrderService : IOrderService
@@ -25,7 +25,7 @@ public class OrderService : IOrderService
     /// <summary>
     /// Cria um novo pedido com os itens selecionados
     /// </summary>
-    public async Task<OrderResponse> CreateOrderAsync(List<Guid> itemIds)
+    public async Task<PedidoResponse> CreateOrderAsync(List<Guid> itemIds)
     {
         if (itemIds == null || !itemIds.Any())
             throw new ArgumentException("É necessário pelo menos um item para criar um pedido.", nameof(itemIds));
@@ -44,7 +44,7 @@ public class OrderService : IOrderService
                 $"Erro ao criar pedido: {response.StatusCode} - {errorContent}");
         }
         
-        var result = await response.Content.ReadFromJsonAsync<ApiResponse<OrderResponse>>();
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<PedidoResponse>>();
         
         if (result?.Success != true)
         {
@@ -57,58 +57,20 @@ public class OrderService : IOrderService
     /// <summary>
     /// Obtém um pedido pelo ID
     /// </summary>
-    public async Task<OrderResponse?> GetOrderByIdAsync(Guid orderId)
+    public async Task<PedidoResponse?> GetOrderByIdAsync(Guid orderId)
     {
-        var response = await _httpClient.GetFromJsonAsync<ApiResponse<OrderResponse>>($"api/Pedidos/{orderId}");
+        var response = await _httpClient.GetFromJsonAsync<ApiResponse<PedidoResponse>>($"api/Pedidos/{orderId}");
         return response?.Result;
     }
     
     /// <summary>
     /// Obtém todos os pedidos com paginação
     /// </summary>
-    public async Task<PagedOrderResponse> GetAllOrdersAsync(int pageNumber = 1, int pageSize = 10)
+    public async Task<PagedPedidoResponse> GetAllOrdersAsync(int pageNumber = 1, int pageSize = 10)
     {
-        var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedOrderResponse>>(
+        var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedPedidoResponse>>(
             $"api/Pedidos?pageNumber={pageNumber}&pageSize={pageSize}");
         
-        return response?.Result ?? new PagedOrderResponse();
+        return response?.Result ?? new PagedPedidoResponse();
     }
-}
-
-/// <summary>
-/// Resposta da criação de pedido
-/// </summary>
-public class OrderResponse
-{
-    public Guid PedidoId { get; set; }
-    public decimal Subtotal { get; set; }
-    public decimal Desconto { get; set; }
-    public decimal Total { get; set; }
-    public List<OrderItemDto> Itens { get; set; } = new();
-    public DateTime DataCriacao { get; set; }
-}
-
-/// <summary>
-/// Item do pedido
-/// </summary>
-public class OrderItemDto
-{
-    public Guid ItemId { get; set; }
-    public string ItemNome { get; set; } = string.Empty;
-    public string Categoria { get; set; } = string.Empty;
-    public decimal PrecoUnitario { get; set; }
-    public int Quantidade { get; set; }
-    public decimal Subtotal => PrecoUnitario * Quantidade;
-}
-
-/// <summary>
-/// Resposta paginada de pedidos
-/// </summary>
-public class PagedOrderResponse
-{
-    public List<OrderResponse> Pedidos { get; set; } = new();
-    public int PageNumber { get; set; }
-    public int PageSize { get; set; }
-    public int TotalPages { get; set; }
-    public int TotalRecords { get; set; }
 }

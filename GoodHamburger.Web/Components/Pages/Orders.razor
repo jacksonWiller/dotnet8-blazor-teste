@@ -1,197 +1,130 @@
 @page "/orders"
 @using GoodHamburger.Web.Components.Models
+@using GoodHamburger.Web.Services
+@using System.Linq
 @inject NavigationManager Navigation
+@inject IOrderService OrderService
 @rendermode InteractiveServer
 
-<section class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon pending">
-            <i class="bi bi-clock"></i>
-        </div>
-        <div class="stat-info">
-            <h3>@pendingOrders.Count</h3>
-            <p>Pending</p>
-        </div>
+@if (loading)
+{
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Carregando pedidos...</p>
     </div>
+}
+else
+{
+    <section class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <i class="bi bi-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3>@pedidos.Count</h3>
+                <p>Total de Pedidos</p>
+            </div>
+        </div>
+    </section>
 
-    <div class="stat-card">
-        <div class="stat-icon cooking">
-            <i class="bi bi-fire"></i>
-        </div>
-        <div class="stat-info">
-            <h3>@cookingOrders.Count</h3>
-            <p>In Cooking</p>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon ready">
-            <i class="bi bi-check-circle"></i>
-        </div>
-        <div class="stat-info">
-            <h3>@readyOrders.Count</h3>
-            <p>Ready</p>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon completed">
-            <i class="bi bi-check-lg"></i>
-        </div>
-        <div class="stat-info">
-            <h3>@completedOrders.Count</h3>
-            <p>Completed</p>
-        </div>
-    </div>
-</section>
-
-<div class="orders-filter-row">
-    <div class="status-filters">
-        <div class="status-filter active" data-status="all">
-            <i class="bi bi-grid"></i> All Orders
-        </div>
-        <div class="status-filter" data-status="pending">
-            <i class="bi bi-clock"></i> Pending
-        </div>
-        <div class="status-filter" data-status="cooking">
-            <i class="bi bi-fire"></i> Cooking
-        </div>
-        <div class="status-filter" data-status="ready">
-            <i class="bi bi-check-circle"></i> Ready
-        </div>
-        <div class="status-filter" data-status="completed">
-            <i class="bi bi-check-lg"></i> Completed
-        </div>
-    </div>
-    <div class="filter-actions">
-        <button class="btn-filter">
-            <i class="bi bi-funnel"></i> Filter
-        </button>
-        <button class="btn-filter">
-            <i class="bi bi-download"></i> Export
-        </button>
-    </div>
-</div>
-
-<section class="orders-table">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Time</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var order in filteredOrders)
-            {
-                <tr data-status="@order.Status">
-                    <td>
-                        <span class="order-id">#@order.OrderId</span>
-                    </td>
-                    <td>
-                        <div class="customer-info">
-                            <div class="customer-avatar">@order.CustomerInitials</div>
-                            <div class="customer-name">@order.CustomerName</div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="order-items">
-                            @for (int i = 0; i < order.Items.Count; i++)
-                            {
-                                if (i < 3)
-                                {
-                                    <span class="item-badge">@order.Items[i]</span>
-                                }
-                                else if (i == 3)
-                                {
-                                    <span class="item-more">+@((order.Items.Count - 3)) more</span>
-                                }
-                            }
-                        </div>
-                    </td>
-                    <td>
-                        <span class="order-total">@order.Total</span>
-                    </td>
-                    <td>
-                        <span class="status-badge status-@order.Status">@order.Status</span>
-                    </td>
-                    <td>
-                        <span class="order-time">@order.Time</span>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-action" type="button" title="View" @onclick='() => Navigation.NavigateTo($"/orders/{order.OrderId}")'>
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn-action" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn-action" title="Delete">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </td>
+    <section class="orders-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Pedido ID</th>
+                    <th>Itens</th>
+                    <th>Total</th>
+                    <th>Data de Criação</th>
+                    <th>Ações</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</section>
-
-<a class="floating-btn" href="#orders">📋</a>
+            </thead>
+            <tbody>
+                @if (pedidos.Any())
+                {
+                    @foreach (var pedido in pedidos)
+                    {
+                        <tr>
+                            <td>
+                                <span class="order-id">#@pedido.Id.ToString().Substring(0, 8)</span>
+                            </td>
+                            <td>
+                                <div class="order-items">
+                                    @for (int i = 0; i < pedido.Itens.Count; i++)
+                                    {
+                                        if (i < 3)
+                                        {
+                                            <span class="item-badge">@pedido.Itens[i].ItemNome (@pedido.Itens[i].Quantidade)x</span>
+                                        }
+                                        else if (i == 3)
+                                        {
+                                            <span class="item-more">+@((pedido.Itens.Count - 3)) mais</span>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <span class="order-total">@FormatCurrency(pedido.Total)</span>
+                            </td>
+                            <td>
+                                <span class="order-time">@FormatDate(pedido.DataCriacao)</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action" type="button" title="Ver" @onclick='() => Navigation.NavigateTo($"/orders/{pedido.Id}")'>
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px;">
+                            <p>Nenhum pedido encontrado.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+}
 
 @code {
-    private List<Order> allOrders = new()
-    {
-        new() { OrderId = 1001, CustomerName = "John Doe", CustomerInitials = "JD", Items = new List<string> { "The OG Classic", "Truffle Fries", "Citrus Mist" }, Total = "$24.90", Status = "pending", Time = "10:23 AM" },
-        new() { OrderId = 1002, CustomerName = "Jane Smith", CustomerInitials = "JS", Items = new List<string> { "Spicy Buffalo", "Colossal Rings" }, Total = "$17.40", Status = "cooking", Time = "10:15 AM" },
-        new() { OrderId = 1003, CustomerName = "Mike Johnson", CustomerInitials = "MJ", Items = new List<string> { "The Green Garden", "Zesty Slaw", "Choco-Fudge Shake" }, Total = "$24.20", Status = "ready", Time = "09:58 AM" },
-        new() { OrderId = 1004, CustomerName = "Sarah Williams", CustomerInitials = "SW", Items = new List<string> { "The OG Classic", "Truffle Fries" }, Total = "$19.40", Status = "completed", Time = "09:45 AM" },
-        new() { OrderId = 1005, CustomerName = "David Brown", CustomerInitials = "DB", Items = new List<string> { "Spicy Buffalo", "Citrus Mist", "Zesty Slaw" }, Total = "$19.50", Status = "pending", Time = "10:30 AM" },
-        new() { OrderId = 1006, CustomerName = "Emily Davis", CustomerInitials = "ED", Items = new List<string> { "The Green Garden", "Choco-Fudge Shake" }, Total = "$20.70", Status = "cooking", Time = "10:28 AM" },
-        new() { OrderId = 1007, CustomerName = "Chris Wilson", CustomerInitials = "CW", Items = new List<string> { "Colossal Rings", "Truffle Fries", "Citrus Mist" }, Total = "$16.90", Status = "completed", Time = "09:30 AM" },
-        new() { OrderId = 1008, CustomerName = "Lisa Anderson", CustomerInitials = "LA", Items = new List<string> { "The OG Classic", "Spicy Buffalo", "Choco-Fudge Shake" }, Total = "$31.60", Status = "ready", Time = "10:32 AM" }
-    };
+    private List<PedidoResponse> pedidos = new();
+    private bool loading = true;
 
-    private List<Order> pendingOrders = new()
+    protected override async Task OnInitializedAsync()
     {
-        new() { OrderId = 1001, CustomerName = "John Doe", CustomerInitials = "JD", Items = new List<string> { "The OG Classic", "Truffle Fries", "Citrus Mist" }, Total = "$24.90", Status = "pending", Time = "10:23 AM" },
-        new() { OrderId = 1005, CustomerName = "David Brown", CustomerInitials = "DB", Items = new List<string> { "Spicy Buffalo", "Citrus Mist", "Zesty Slaw" }, Total = "$19.50", Status = "pending", Time = "10:30 AM" }
-    };
+        await LoadPedidosAsync();
+    }
 
-    private List<Order> cookingOrders = new()
+    private async Task LoadPedidosAsync()
     {
-        new() { OrderId = 1002, CustomerName = "Jane Smith", CustomerInitials = "JS", Items = new List<string> { "Spicy Buffalo", "Colossal Rings" }, Total = "$17.40", Status = "cooking", Time = "10:15 AM" },
-        new() { OrderId = 1006, CustomerName = "Emily Davis", CustomerInitials = "ED", Items = new List<string> { "The Green Garden", "Choco-Fudge Shake" }, Total = "$20.70", Status = "cooking", Time = "10:28 AM" }
-    };
+        try
+        {
+            loading = true;
+            var response = await OrderService.GetAllOrdersAsync(1, 100);
+            pedidos = response.Pedidos;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao carregar pedidos: {ex.Message}");
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
 
-    private List<Order> readyOrders = new()
+    private string FormatCurrency(decimal value)
     {
-        new() { OrderId = 1003, CustomerName = "Mike Johnson", CustomerInitials = "MJ", Items = new List<string> { "The Green Garden", "Zesty Slaw", "Choco-Fudge Shake" }, Total = "$24.20", Status = "ready", Time = "09:58 AM" },
-        new() { OrderId = 1008, CustomerName = "Lisa Anderson", CustomerInitials = "LA", Items = new List<string> { "The OG Classic", "Spicy Buffalo", "Choco-Fudge Shake" }, Total = "$31.60", Status = "ready", Time = "10:32 AM" }
-    };
+        return value.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+    }
 
-    private List<Order> completedOrders = new()
+    private string FormatDate(DateTime date)
     {
-        new() { OrderId = 1004, CustomerName = "Sarah Williams", CustomerInitials = "SW", Items = new List<string> { "The OG Classic", "Truffle Fries" }, Total = "$19.40", Status = "completed", Time = "09:45 AM" },
-        new() { OrderId = 1007, CustomerName = "Chris Wilson", CustomerInitials = "CW", Items = new List<string> { "Colossal Rings", "Truffle Fries", "Citrus Mist" }, Total = "$16.90", Status = "completed", Time = "09:30 AM" }
-    };
-
-    private string currentFilter = "all";
-    private List<Order> filteredOrders => currentFilter == "all" ? allOrders : allOrders.Where(o => o.Status == currentFilter).ToList();
-
-    public class Order
-    {
-        public int OrderId { get; set; }
-        public string CustomerName { get; set; } = string.Empty;
-        public string CustomerInitials { get; set; } = string.Empty;
-        public List<string> Items { get; set; } = new();
-        public string Total { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
-        public string Time { get; set; } = string.Empty;
+        return date.ToString("dd/MM/yyyy HH:mm", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
     }
 }

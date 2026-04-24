@@ -39,7 +39,7 @@
                 <div class="order-header">
                     <div class="order-id">
                         <span class="label">Número do Pedido:</span>
-                        <span class="value">@order.PedidoId.ToString().ToUpper()</span>
+                        <span class="value">@order.Id.ToString().ToUpper()</span>
                     </div>
                     <div class="order-date">
                         <i class="bi bi-calendar"></i>
@@ -103,7 +103,7 @@
 
 @code {
     private bool loading = true;
-    private OrderResponse? order;
+    private PedidoResponse? order;
 
     [Parameter]
     public Guid OrderId { get; set; }

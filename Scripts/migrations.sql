@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS "Pedido" (
     "Subtotal" decimal(18,2) NOT NULL,
     "Desconto" decimal(18,2) NOT NULL,
     "Total" decimal(18,2) NOT NULL,
+    "Status" integer NOT NULL DEFAULT 0,
     "DataCriacao" timestamp with time zone NOT NULL,
 
     CONSTRAINT "PK_Pedido" PRIMARY KEY ("Id")

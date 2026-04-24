@@ -1,3 +1,5 @@
+using Dominio.ObjetosDeValor;
+
 namespace Dominio.Dtos
 {
     /// <summary>
@@ -33,6 +35,7 @@ namespace Dominio.Dtos
         public decimal Subtotal { get; set; }
         public decimal Desconto { get; set; }
         public decimal Total { get; set; }
+        public PedidoStatus Status { get; set; }
         public DateTime DataCriacao { get; set; }
     }
 }

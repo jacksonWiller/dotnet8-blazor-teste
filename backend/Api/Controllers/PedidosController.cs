@@ -9,6 +9,7 @@ using Clientes.Api.Models;
 using Dominio.Dtos;
 using Dominio.Entidades;
 using Dominio.Interfaces;
+using Dominio.ObjetosDeValor;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;

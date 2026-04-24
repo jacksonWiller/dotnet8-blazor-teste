@@ -1,4 +1,5 @@
 using Dominio.Eventos;
+using Dominio.ObjetosDeValor;
 
 namespace Dominio.Entidades
 {
@@ -12,6 +13,7 @@ namespace Dominio.Entidades
         public decimal Subtotal { get; private set; }
         public decimal Desconto { get; private set; }
         public decimal Total { get; private set; }
+        public PedidoStatus Status { get; private set; }
         public DateTime DataCriacao { get; private set; }
 
         protected Pedido() { }
@@ -26,6 +28,7 @@ namespace Dominio.Entidades
             Subtotal = 0;
             Desconto = 0;
             Total = 0;
+            Status = PedidoStatus.Pendente;
             DataCriacao = DateTime.UtcNow;
         }
 
@@ -79,6 +82,7 @@ namespace Dominio.Entidades
         private void RecalcularTotais()
         {
             Subtotal = CalcularSubtotal();
+            Desconto = CalcularDesconto();
             Total = Subtotal - Desconto;
         }
 
@@ -86,7 +90,110 @@ namespace Dominio.Entidades
         /// Calcula o subtotal de todos os itens
         /// </summary>
         private decimal CalcularSubtotal() => Itens.Sum(i => i.PrecoUnitario);
-        
+
+        /// <summary>
+        /// Calcula o desconto baseado nas regras de negócio
+        /// </summary>
+        private decimal CalcularDesconto()
+        {
+            var temSanduiche = TemSanduiche();
+            var temBatata = TemBatata();
+            var temRefrigerante = TemRefrigerante();
+
+            // Regra 1: Sanduíche + Batata + Refrigerante → 20% de desconto
+            if (temSanduiche && temBatata && temRefrigerante)
+                return Subtotal * 0.20m;
+
+            // Regra 2: Sanduíche + Refrigerante → 15% de desconto
+            if (temSanduiche && temRefrigerante)
+                return Subtotal * 0.15m;
+
+            // Regra 3: Sanduíche + Batata → 10% de desconto
+            if (temSanduiche && temBatata)
+                return Subtotal * 0.10m;
+
+            // Nenhuma regra aplicada
+            return 0;
+        }
+
+        /// <summary>
+        /// Verifica se o pedido já tem batata
+        /// </summary>
+        private bool TemBatata() => Itens.Any(i => i.Categoria.Contains("Batata"));
+
+        /// <summary>
+        /// Verifica se o pedido já tem refrigerante
+        /// </summary>
+        private bool TemRefrigerante() => Itens.Any(i => i.Categoria.Contains("Refrigerante"));
+
+        /// <summary>
+        /// Muda o status do pedido com validação de transição
+        /// </summary>
+        public void MudarStatus(PedidoStatus novoStatus)
+        {
+            ValidarTransicaoDeStatus(Status, novoStatus);
+            Status = novoStatus;
+        }
+
+        /// <summary>
+        /// Cancela o pedido
+        /// </summary>
+        public void CancelarPedido()
+        {
+            if (Status == PedidoStatus.Cancelado)
+                throw new InvalidOperationException("O pedido já está cancelado.");
+
+            if (Status == PedidoStatus.Entregue)
+                throw new InvalidOperationException("Não é possível cancelar um pedido entregue.");
+
+            MudarStatus(PedidoStatus.Cancelado);
+        }
+
+        /// <summary>
+        /// Valida se a transição de status é permitida
+        /// </summary>
+        private void ValidarTransicaoDeStatus(PedidoStatus statusAtual, PedidoStatus novoStatus)
+        {
+            if (statusAtual == novoStatus)
+                return; // Não há mudança
+
+            // Transições permitidas
+            var transicoesPermitidas = new Dictionary<PedidoStatus, List<PedidoStatus>>
+            {
+                { PedidoStatus.Pendente, new List<PedidoStatus> 
+                    { PedidoStatus.EmPreparacao, PedidoStatus.Cancelado } },
+                
+                { PedidoStatus.EmPreparacao, new List<PedidoStatus> 
+                    { PedidoStatus.Pronto, PedidoStatus.Cancelado } },
+                
+                { PedidoStatus.Pronto, new List<PedidoStatus> 
+                    { PedidoStatus.Entregue, PedidoStatus.Cancelado } },
+                
+                { PedidoStatus.Entregue, new List<PedidoStatus>() }, // Não permite mais transições
+                
+                { PedidoStatus.Cancelado, new List<PedidoStatus>() } // Não permite mais transições
+            };
+
+            if (!transicoesPermitidas.ContainsKey(statusAtual))
+                throw new InvalidOperationException($"Status inicial inválido: {statusAtual}");
+
+            if (!transicoesPermitidas[statusAtual].Contains(novoStatus))
+                throw new InvalidOperationException(
+                    $"Não é possível transicionar de {statusAtual} para {novoStatus}");
+        }
+
+        /// <summary>
+        /// Verifica se o pedido pode ser atualizado (apenas pendente)
+        /// </summary>
+        public bool PodeSerAtualizado() => Status == PedidoStatus.Pendente;
+
+        /// <summary>
+        /// Verifica se o pedido pode ser cancelado
+        /// </summary>
+        public bool PodeSerCancelado() => 
+            Status == PedidoStatus.Pendente || 
+            Status == PedidoStatus.EmPreparacao || 
+            Status == PedidoStatus.Pronto;
 
     }
 }

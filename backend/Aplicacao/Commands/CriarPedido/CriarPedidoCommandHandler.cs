@@ -41,16 +41,19 @@ namespace Aplicacao.Commands.CriarPedido
             // Criar pedido
             var pedido = new Pedido();
 
-            // Adicionar itens ao pedido
-            foreach (var itemId in request.ItensIds)
+            // Buscar todos os itens de uma vez
+            var items = await _itemRepository.GetItemsByIdsAsync(request.ItensIds);
+            
+            if (items.Count != request.ItensIds.Count)
             {
-                var item = await _itemRepository.GetItemByIdAsync(itemId);
-                
-                if (item == null)
-                {
-                    return Result<CriarPedidoCommandResponse>.NotFound($"Item com ID {itemId} não encontrado no cardápio.");
-                }
+                var itensNaoEncontrados = request.ItensIds.Where(id => !items.Any(i => i.Id == id)).ToList();
+                return Result<CriarPedidoCommandResponse>.NotFound(
+                    $"Itens não encontrados: {string.Join(", ", itensNaoEncontrados.Select(id => id.ToString()))}");
+            }
 
+            // Adicionar itens ao pedido
+            foreach (var item in items)
+            {
                 try
                 {
                     pedido.AdicionarItem(item);

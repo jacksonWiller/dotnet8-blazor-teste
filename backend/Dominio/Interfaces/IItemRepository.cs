@@ -42,5 +42,10 @@ namespace Dominio.Interfaces
         /// Verifica se existe item com o mesmo nome
         /// </summary>
         Task<bool> ExisteItemComNomeAsync(string nome, Guid itemId = default);
+        
+        /// <summary>
+        /// Obtém múltiplos itens por IDs
+        /// </summary>
+        Task<List<Item>> GetItemsByIdsAsync(List<Guid> itemIds);
     }
 }

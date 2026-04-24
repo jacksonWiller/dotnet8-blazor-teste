@@ -1,8 +1,5 @@
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
-using Aplicacao.Commands.UpdatePedido;
-using Dominio.Dtos;
-using Dominio.Entidades;
 using Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
@@ -38,32 +35,50 @@ namespace Aplicacao.Commands.UpdatePedido
             var validationResult = await _validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
             {
-                return Result.Invalid(validationResult.AsErrors());
+                return Result<UpdatePedidoCommandResponse>.Invalid(validationResult.AsErrors());
             }
 
             // Buscar o pedido existente
             var pedido = await _pedidoRepository.GetPedidoByIdAsync(request.Id);
             if (pedido == null)
             {
-                return Result.NotFound($"Pedido com ID {request.Id} não encontrado.");
+                return Result<UpdatePedidoCommandResponse>.NotFound($"Pedido com ID {request.Id} não encontrado.");
             }
 
 
-            var item = await _itemRepository.GetAllItemsAsync(x => x.Id == itemId);
+            // Buscar todos os itens de uma vez
+            var items = await _itemRepository.GetItemsByIdsAsync(request.ItensIds);
+            
+            if (items.Count != request.ItensIds.Count)
+            {
+                var itensNaoEncontrados = request.ItensIds.Where(id => !items.Any(i => i.Id == id)).ToList();
+                return Result<UpdatePedidoCommandResponse>.NotFound(
+                    $"Itens não encontrados: {string.Join(", ", itensNaoEncontrados.Select(id => id.ToString()))}");
+            }
+
+            // Adicionar novos itens ao pedido
+            foreach (var item in items)
+            {
+                try
+                {
+                    pedido.AdicionarItem(item);
+                }
+                catch (ArgumentException ex)
+                {
+                    return Result.Error(ex.Message);
+                }
+            }
 
             // Salvar alterações
             await _pedidoRepository.AtualizarAsync(pedido);
 
-            // Obter informações do pedido
-            var pedidoInfo = pedido.ObterInfo();
-
             var response = new UpdatePedidoCommandResponse
             {
-                PedidoId = pedidoInfo.Id,
-                Subtotal = pedidoInfo.Subtotal,
-                Desconto = pedidoInfo.Desconto,
-                Total = pedidoInfo.Total,
-                Itens = pedidoInfo.Itens.Select(i => new Dominio.Dtos.PedidoItemDto
+                PedidoId = pedido.Id,
+                Subtotal = pedido.Subtotal,
+                Desconto = pedido.Desconto,
+                Total = pedido.Total,
+                Itens = pedido.Itens.Select(i => new Dominio.Dtos.PedidoItemDto
                 {
                     ItemId = i.ItemId,
                     ItemNome = i.ItemNome,

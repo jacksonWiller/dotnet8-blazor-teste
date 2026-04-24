@@ -117,5 +117,21 @@ namespace Infra.Repositorio
             return await _dataContext.Itens
                 .AnyAsync(i => i.Nome == nome && i.Id != itemId && i.Ativo);
         }
+
+        /// <summary>
+        /// Obtém múltiplos itens por IDs
+        /// </summary>
+        public async Task<List<Item>> GetItemsByIdsAsync(List<Guid> itemIds)
+        {
+            if (itemIds == null || !itemIds.Any())
+            {
+                return new List<Item>();
+            }
+
+            return await _dataContext.Itens
+                .Where(i => itemIds.Contains(i.Id) && i.Ativo)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

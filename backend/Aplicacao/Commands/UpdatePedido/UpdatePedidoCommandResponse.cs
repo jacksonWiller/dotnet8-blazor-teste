@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using Dominio.Dtos;
+using Dominio.ObjetosDeValor;
 
 namespace Aplicacao.Commands.UpdatePedido
 {
@@ -9,6 +10,7 @@ namespace Aplicacao.Commands.UpdatePedido
     public class UpdatePedidoCommandResponse
     {
         public Guid PedidoId { get; set; }
+        public PedidoStatus Status { get; set; }
         public decimal Subtotal { get; set; }
         public decimal Desconto { get; set; }
         public decimal Total { get; set; }

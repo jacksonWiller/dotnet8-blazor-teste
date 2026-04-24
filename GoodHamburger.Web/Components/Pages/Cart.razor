@@ -8,12 +8,13 @@
 
 <div class="cart-page">
     <div class="cart-header">
-        <h1>🛒 Seu Carrinho</h1>
+        <h1>🛒 @(_cartServiceHasItems ? "Seu Carrinho" : "Seu Pedido")</h1>
         <a class="continue-shopping" href="/">Continuar comprando</a>
     </div>
 
-    @if (CartService.Items.Any())
+    @if (_cartServiceHasItems)
     {
+        <!-- Carrinho de Compras -->
         <div class="cart-content">
             <div class="cart-items">
                 @foreach (var item in CartService.Items)
@@ -80,12 +81,105 @@
                     <div class="delivery-estimate">
                         <i class="bi bi-clock"></i> Entrega estimada: 25-35 min
                     </div>
-                    <button class="checkout-btn" @onclick="ProceedToCheckout">
-                        Confirmar Pedido <i class="bi bi-arrow-right"></i>
+                    <button class="checkout-btn" @onclick="ConfirmOrder">
+                        Confirmar Pedido <i class="bi bi-check-circle"></i>
                     </button>
                     <p class="terms">Ao clicar em confirmar, você concorda com nossos Termos de Serviço.</p>
                 </div>
             </aside>
+        </div>
+    }
+    else if (CartService.HasOrder && _orderDetails != null)
+    {
+        <!-- Pedido Criado - Status e Detalhes -->
+        <div class="order-details">
+            <div class="order-status-section">
+                <div class="status-badge @GetStatusClass(_orderDetails.Status)">
+                    <i class="bi bi-@GetStatusIcon(_orderDetails.Status)"></i>
+                    @GetStatusText(_orderDetails.Status)
+                </div>
+                
+                <!-- Timeline de Status -->
+                <div class="order-timeline">
+                    <div class="timeline-step @(IsStatusAtLeast(_orderDetails.Status, "Pendente") ? "active" : "")">
+                        <div class="step-icon">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="step-label">Pendente</div>
+                    </div>
+                    <div class="timeline-line @(IsStatusAtLeast(_orderDetails.Status, "EmPreparacao") ? "completed" : "")"></div>
+                    <div class="timeline-step @(IsStatusAtLeast(_orderDetails.Status, "EmPreparacao") ? "active" : "")">
+                        <div class="step-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="step-label">Em Preparação</div>
+                    </div>
+                    <div class="timeline-line @(IsStatusAtLeast(_orderDetails.Status, "Pronto") ? "completed" : "")"></div>
+                    <div class="timeline-step @(IsStatusAtLeast(_orderDetails.Status, "Pronto") ? "active" : "")">
+                        <div class="step-icon">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <div class="step-label">Pronto</div>
+                    </div>
+                    <div class="timeline-line @(IsStatusAtLeast(_orderDetails.Status, "Entregue") ? "completed" : "")"></div>
+                    <div class="timeline-step @(IsStatusAtLeast(_orderDetails.Status, "Entregue") ? "active" : "")">
+                        <div class="step-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <div class="step-label">Entregue</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-items-section">
+                <h3>Itens do Pedido</h3>
+                @foreach (var item in _orderDetails.Itens)
+                {
+                    <div class="order-item">
+                        <div class="order-item-info">
+                            <span class="item-name">@item.ItemNome</span>
+                            <span class="item-category">@item.Categoria</span>
+                        </div>
+                        <div class="order-item-quantity">x@item.Quantidade</div>
+                        <div class="order-item-price">@item.PrecoUnitario.ToString("C2")</div>
+                    </div>
+                }
+            </div>
+
+            <div class="order-summary">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span><strong>@_orderDetails.Subtotal.ToString("C2")</strong></span>
+                </div>
+                @if (_orderDetails.Desconto > 0)
+                {
+                    <div class="summary-row discount">
+                        <span><i class="bi bi-tag"></i> Desconto</span>
+                        <span>- @_orderDetails.Desconto.ToString("C2")</span>
+                    </div>
+                }
+                <div class="summary-row">
+                    <span>Taxa de Entrega</span>
+                    <span><strong>@CartService.DeliveryFee.ToString("C2")</strong></span>
+                </div>
+                <div class="divider"></div>
+                <div class="total-row">
+                    <span>Total</span>
+                    <span class="total-amount">@_orderDetails.Total.ToString("C2")</span>
+                </div>
+            </div>
+
+            <div class="order-actions">
+                @if (_orderDetails.Status == "Pendente")
+                {
+                    <button class="cancel-btn" @onclick="CancelOrder">
+                        <i class="bi bi-x-circle"></i> Cancelar Pedido
+                    </button>
+                }
+                <button class="back-btn" @onclick="NavigateToHome">
+                    <i class="bi bi-arrow-left"></i> Voltar ao Início
+                </button>
+            </div>
         </div>
     }
     else
@@ -104,48 +198,125 @@
 </div>
 
 @code {
+    private PedidoDetalhes? _orderDetails;
+    private bool _cartServiceHasItems;
+    private bool _isLoading = true;
+
     protected override async Task OnInitializedAsync()
     {
         await CartService.InitializeCartAsync();
-        CartService.OnChange += StateHasChanged;
+        
+        await CheckOrderStatus();
     }
 
-    private async Task ProceedToCheckout()
+    private async Task CheckOrderStatus()
+    {
+        _isLoading = true;
+        StateHasChanged();
+        
+        if (CartService.HasOrder && CartService.OrderId.HasValue)
+        {
+            try
+            {
+                var response = await OrderService.GetOrderByIdAsync(CartService.OrderId.Value);
+                if (response != null)
+                {
+                    _orderDetails = response;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro ao buscar pedido: {ex.Message}");
+            }
+        }
+        
+        _cartServiceHasItems = CartService.Items.Any();
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+    private async void OnOrderCreatedHandler()
+    {
+        await CheckOrderStatus();
+    }
+
+    private async Task ConfirmOrder()
     {
         try
         {
-            // Extrair os IDs dos itens do carrinho
-            var itemIds = CartService.Items.Select(i => i.ItemId).ToList();
-            
-            if (!itemIds.Any())
-            {
-                return;
-            }
-            
-            // Criar o pedido no backend
-            await OrderService.CreateOrderAsync(itemIds);
-            
-            // Limpar o carrinho após criar o pedido
-            await CartService.ClearCartAsync();
-            
-            // Redirecionar para a página de sucesso
-            Navigation.NavigateTo("/checkout/success");
+            await CartService.CreateOrderAsync(OrderService);
+            // O evento OnOrderCreated vai disparar e recarregar o status
         }
         catch (Exception ex)
         {
-            // Tratar erro
-            System.Diagnostics.Debug.WriteLine($"Erro ao criar pedido: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Erro ao confirmar pedido: {ex.Message}");
             // Aqui você pode implementar um sistema de notificação/toast
-            // Por enquanto, apenas exibe no console
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    private async Task CancelOrder()
     {
-        if (firstRender)
+        try
         {
+            await CartService.CancelOrderAsync(OrderService);
+            _orderDetails = null;
+            _cartServiceHasItems = false;
             StateHasChanged();
         }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erro ao cancelar pedido: {ex.Message}");
+        }
+    }
+
+    private string GetStatusClass(string status) => status switch
+    {
+        "Pendente" => "status-pending",
+        "EmPreparacao" => "status-cooking",
+        "Pronto" => "status-ready",
+        "Entregue" => "status-completed",
+        "Cancelado" => "status-cancelled",
+        _ => "status-pending"
+    };
+
+    private string GetStatusIcon(string status) => status switch
+    {
+        "Pendente" => "hourglass-split",
+        "EmPreparacao" => "fire",
+        "Pronto" => "check-circle",
+        "Entregue" => "truck",
+        "Cancelado" => "x-circle",
+        _ => "hourglass-split"
+    };
+
+    private string GetStatusText(string status) => status switch
+    {
+        "Pendente" => "Pendente",
+        "EmPreparacao" => "Em Preparação",
+        "Pronto" => "Pronto",
+        "Entregue" => "Entregue",
+        "Cancelado" => "Cancelado",
+        _ => "Pendente"
+    };
+
+    private bool IsStatusAtLeast(string currentStatus, string targetStatus)
+    {
+        var statuses = new[] { "Pendente", "EmPreparacao", "Pronto", "Entregue", "Cancelado" };
+        var currentIndex = Array.IndexOf(statuses, currentStatus);
+        var targetIndex = Array.IndexOf(statuses, targetStatus);
+        return currentIndex >= targetIndex && currentIndex >= 0 && targetIndex >= 0;
+    }
+
+    protected override void OnInitialized()
+    {
+        CartService.OnChange += StateHasChanged;
+        CartService.OnOrderCreated += OnOrderCreatedHandler;
+    }
+
+    public void Dispose()
+    {
+        CartService.OnChange -= StateHasChanged;
+        CartService.OnOrderCreated -= OnOrderCreatedHandler;
     }
 
     private async Task IncreaseQuantityAsync(Guid itemId)
@@ -169,6 +340,34 @@
     private async Task RemoveItemAsync(Guid itemId)
     {
         await CartService.RemoveItemAsync(itemId);
+    }
+
+    /// <summary>
+    /// Atualiza o pedido com novos itens e status
+    /// </summary>
+    private async Task UpdateOrderAsync(string novoStatus)
+    {
+        try
+        {
+            if (_orderDetails == null || CartService.OrderId == null)
+                return;
+
+            var itensAtualizados = _orderDetails.Itens.Select(i => new UpdateOrderItemDto
+            {
+                ItemId = i.ItemId,
+                Quantidade = i.Quantidade
+            }).ToList();
+
+            await OrderService.UpdateOrderAsync(CartService.OrderId.Value, itensAtualizados, novoStatus);
+            
+            // Recarrega o status do pedido
+            await CheckOrderStatus();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erro ao atualizar pedido: {ex.Message}");
+            // Aqui você pode implementar um sistema de notificação/toast
+        }
     }
 
     private void NavigateToHome()

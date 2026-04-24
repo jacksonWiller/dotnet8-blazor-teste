@@ -1,0 +1,119 @@
+@using GoodHamburger.Web.Components.Models
+
+<div class="order-status-component">
+    @if (!string.IsNullOrEmpty(Status))
+    {
+        <div class="status-header">
+            <div class="status-badge @GetStatusClass(Status)">
+                <i class="bi bi-@GetStatusIcon(Status)"></i>
+                <span class="status-text">@GetStatusText(Status)</span>
+            </div>
+        </div>
+
+        <div class="order-timeline">
+            @foreach (var step in TimelineSteps)
+            {
+                <div class="timeline-step @(step.IsActive ? "active" : "") @(step.IsCompleted ? "completed" : "")">
+                    <div class="step-icon">
+                        @if (step.IsCompleted)
+                        {
+                            <i class="bi bi-check-circle-fill"></i>
+                        }
+                        else if (step.IsActive)
+                        {
+                            <i class="bi bi-@step.Icon"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-circle"></i>
+                        }
+                    </div>
+                    <div class="step-label">@step.Label</div>
+                    @if (step.IsCompleted)
+                    {
+                        <div class="step-time">Concluído</div>
+                    }
+                    @if (step.IsActive)
+                    {
+                        <div class="step-time">Em andamento</div>
+                    }
+                </div>
+
+                @if (!step.IsLast)
+                {
+                    <div class="timeline-line @(step.IsNextCompleted ? "completed" : "")"></div>
+                }
+            }
+        </div>
+
+        <div class="status-description">
+            <p>@GetStatusDescription(Status)</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Status { get; set; } = "Pendente";
+
+    [Parameter]
+    public DateTime? OrderDate { get; set; }
+
+    private List<TimelineStep> TimelineSteps => new()
+    {
+        new TimelineStep { Label = "Pendente", Icon = "hourglass-split", IsCompleted = false, IsActive = Status == "Pendente", IsNextCompleted = false, IsLast = false },
+        new TimelineStep { Label = "Em Preparação", Icon = "fire", IsCompleted = false, IsActive = Status == "EmPreparacao", IsNextCompleted = false, IsLast = false },
+        new TimelineStep { Label = "Pronto", Icon = "box-seam", IsCompleted = false, IsActive = Status == "Pronto", IsNextCompleted = false, IsLast = false },
+        new TimelineStep { Label = "Entregue", Icon = "truck", IsCompleted = false, IsActive = Status == "Entregue", IsNextCompleted = false, IsLast = true }
+    };
+
+    private string GetStatusClass(string status) => status switch
+    {
+        "Pendente" => "status-pending",
+        "EmPreparacao" => "status-cooking",
+        "Pronto" => "status-ready",
+        "Entregue" => "status-completed",
+        "Cancelado" => "status-cancelled",
+        _ => "status-pending"
+    };
+
+    private string GetStatusIcon(string status) => status switch
+    {
+        "Pendente" => "hourglass-split",
+        "EmPreparacao" => "fire",
+        "Pronto" => "box-seam",
+        "Entregue" => "truck",
+        "Cancelado" => "x-circle",
+        _ => "hourglass-split"
+    };
+
+    private string GetStatusText(string status) => status switch
+    {
+        "Pendente" => "Pendente",
+        "EmPreparacao" => "Em Preparação",
+        "Pronto" => "Pronto",
+        "Entregue" => "Entregue",
+        "Cancelado" => "Cancelado",
+        _ => "Pendente"
+    };
+
+    private string GetStatusDescription(string status) => status switch
+    {
+        "Pendente" => "Seu pedido foi recebido e está aguardando confirmação.",
+        "EmPreparacao" => "Estamos preparando seu pedido com carinho!",
+        "Pronto" => "Seu pedido está pronto para entrega/retirada.",
+        "Entregue" => "Seu pedido foi entregue. Bom apetite!",
+        "Cancelado" => "Seu pedido foi cancelado.",
+        _ => "Status do pedido."
+    };
+
+    private class TimelineStep
+    {
+        public string Label { get; set; } = string.Empty;
+        public string Icon { get; set; } = string.Empty;
+        public bool IsCompleted { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsNextCompleted { get; set; }
+        public bool IsLast { get; set; }
+    }
+}

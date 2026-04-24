@@ -2,6 +2,18 @@ using System.Text.Json.Serialization;
 
 namespace GoodHamburger.Web.Components.Models;
 
+/// <summary>
+/// DTO para atualizar um item no pedido
+/// </summary>
+public class UpdateOrderItemDto
+{
+    [JsonPropertyName("itemId")]
+    public Guid ItemId { get; set; }
+    
+    [JsonPropertyName("quantidade")]
+    public int Quantidade { get; set; }
+}
+
 public class PedidoItemDto
 {
     [JsonPropertyName("itemId")]
@@ -45,6 +57,9 @@ public class PedidoDetalhes
     
     [JsonPropertyName("total")]
     public decimal Total { get; set; }
+    
+    [JsonPropertyName("status")]
+    public string Status { get; set; } = "Pendente";
     
     [JsonPropertyName("dataCriacao")]
     public DateTime DataCriacao { get; set; }

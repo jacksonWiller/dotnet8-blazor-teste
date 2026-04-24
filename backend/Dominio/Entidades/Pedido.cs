@@ -183,6 +183,37 @@ namespace Dominio.Entidades
         }
 
         /// <summary>
+        /// Atualiza o status do pedido (sem validação de transição)
+        /// </summary>
+        public void AtualizarStatus(PedidoStatus novoStatus)
+        {
+            Status = novoStatus;
+        }
+
+        /// <summary>
+        /// Adiciona um item com quantidade específica
+        /// </summary>
+        public void AdicionarItemComQuantidade(Item item, int quantidade)
+        {
+            ValidarItem(item);
+
+            var pedidoItem = new PedidoItem(Id, item.Id, item.Nome, item.Categoria, item.Preco, quantidade);
+            Itens.Add(pedidoItem);
+            RecalcularTotais();
+
+            AddDomainEvent(new PedidoItemAdicionadoEvent(Id, item.Id, item.Nome));
+        }
+
+        /// <summary>
+        /// Remove todos os itens do pedido
+        /// </summary>
+        public void RemoverTodosItens()
+        {
+            Itens.Clear();
+            RecalcularTotais();
+        }
+
+        /// <summary>
         /// Verifica se o pedido pode ser atualizado (apenas pendente)
         /// </summary>
         public bool PodeSerAtualizado() => Status == PedidoStatus.Pendente;

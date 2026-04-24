@@ -45,27 +45,36 @@ namespace Aplicacao.Commands.UpdatePedido
                 return Result<UpdatePedidoCommandResponse>.NotFound($"Pedido com ID {request.Id} não encontrado.");
             }
 
+            // Atualizar status do pedido
+            pedido.AtualizarStatus(request.Status);
+
+            // Remover todos os itens atuais
+            pedido.RemoverTodosItens();
 
             // Buscar todos os itens de uma vez
-            var items = await _itemRepository.GetItemsByIdsAsync(request.ItensIds);
+            var items = await _itemRepository.GetItemsByIdsAsync(request.Itens.Select(i => i.ItemId).ToList());
             
-            if (items.Count != request.ItensIds.Count)
+            if (items.Count != request.Itens.Count)
             {
-                var itensNaoEncontrados = request.ItensIds.Where(id => !items.Any(i => i.Id == id)).ToList();
+                var itensNaoEncontrados = request.Itens.Select(i => i.ItemId).Where(id => !items.Any(i => i.Id == id)).ToList();
                 return Result<UpdatePedidoCommandResponse>.NotFound(
                     $"Itens não encontrados: {string.Join(", ", itensNaoEncontrados.Select(id => id.ToString()))}");
             }
 
-            // Adicionar novos itens ao pedido
-            foreach (var item in items)
+            // Adicionar itens com as novas quantidades
+            foreach (var itemRequest in request.Itens)
             {
-                try
+                var item = items.FirstOrDefault(i => i.Id == itemRequest.ItemId);
+                if (item != null)
                 {
-                    pedido.AdicionarItem(item);
-                }
-                catch (ArgumentException ex)
-                {
-                    return Result.Error(ex.Message);
+                    try
+                    {
+                        pedido.AdicionarItemComQuantidade(item, itemRequest.Quantidade);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return Result.Error(ex.Message);
+                    }
                 }
             }
 
@@ -75,6 +84,7 @@ namespace Aplicacao.Commands.UpdatePedido
             var response = new UpdatePedidoCommandResponse
             {
                 PedidoId = pedido.Id,
+                Status = pedido.Status,
                 Subtotal = pedido.Subtotal,
                 Desconto = pedido.Desconto,
                 Total = pedido.Total,

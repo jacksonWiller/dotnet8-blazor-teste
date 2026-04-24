@@ -18,28 +18,38 @@ public interface ICartService
     decimal DeliveryFee { get; }
     decimal Discount { get; }
     decimal Total { get; }
+    Guid? OrderId { get; }
+    bool HasOrder { get; }
     
     event Action? OnChange;
+    event Action? OnOrderCreated;
     
     Task AddItemAsync(ItemDto item);
     Task RemoveItemAsync(Guid itemId);
     Task UpdateQuantityAsync(Guid itemId, int quantity);
     Task ClearCartAsync();
     Task InitializeCartAsync();
+    Task CreateOrderAsync(IOrderService orderService);
+    Task CancelOrderAsync(IOrderService orderService);
 }
 
 public class CartService : ICartService
 {
     private const string CartKey = "goodhamburger_cart";
+    private const string OrderIdKey = "goodhamburger_orderid";
     private List<CartItem> _cartItems = new();
     private readonly IJSRuntime _jsRuntime;
     private readonly NavigationManager _navigation;
+    private readonly IOrderService _orderService;
     
     private readonly decimal _deliveryFee = 3.50m;
     private readonly int _minComboItemsForDiscount = 2;
     private readonly decimal _discountPercentage = 0.20m;
     
+    private Guid? _orderId;
+    
     public event Action? OnChange;
+    public event Action? OnOrderCreated;
     
     public IReadOnlyList<CartItem> Items => _cartItems;
     public int ItemCount => _cartItems.Sum(i => i.Quantity);
@@ -47,11 +57,14 @@ public class CartService : ICartService
     public decimal DeliveryFee => _deliveryFee;
     public decimal Discount { get; private set; }
     public decimal Total { get; private set; }
+    public Guid? OrderId => _orderId;
+    public bool HasOrder => _orderId.HasValue;
     
-    public CartService(IJSRuntime jsRuntime, NavigationManager navigation)
+    public CartService(IJSRuntime jsRuntime, NavigationManager navigation, IOrderService orderService)
     {
         _jsRuntime = jsRuntime;
         _navigation = navigation;
+        _orderService = orderService;
     }
     
     public async Task InitializeCartAsync()
@@ -69,6 +82,15 @@ public class CartService : ICartService
             else
             {
                 _cartItems = new List<CartItem>();
+            }
+            
+            // Carregar Order ID se existir
+            var orderIdJson = await _jsRuntime.InvokeAsync<string>(
+                "localStorage.getItem", OrderIdKey);
+            
+            if (!string.IsNullOrEmpty(orderIdJson) && Guid.TryParse(orderIdJson, out var orderId))
+            {
+                _orderId = orderId;
             }
             
             CalculateTotals();
@@ -157,6 +179,47 @@ public class CartService : ICartService
     {
         _cartItems.Clear();
         await SaveCartAsync();
+    }
+    
+    /// <summary>
+    /// Cria um pedido a partir do carrinho
+    /// </summary>
+    public async Task CreateOrderAsync(IOrderService orderService)
+    {
+        if (_cartItems == null || !_cartItems.Any())
+            throw new InvalidOperationException("O carrinho está vazio.");
+        
+        var itemIds = _cartItems.Select(i => i.ItemId).ToList();
+        var orderResponse = await orderService.CreateOrderAsync(itemIds);
+        
+        _orderId = orderResponse.Pedido.Id;
+        
+        // Salvar Order ID no localStorage
+        await _jsRuntime.InvokeAsync<object>(
+            "localStorage.setItem", OrderIdKey, _orderId.ToString());
+        
+        // Limpar carrinho após criar pedido
+        _cartItems.Clear();
+        await SaveCartAsync();
+        
+        OnOrderCreated?.Invoke();
+    }
+    
+    /// <summary>
+    /// Cancela o pedido atual
+    /// </summary>
+    public async Task CancelOrderAsync(IOrderService orderService)
+    {
+        if (!_orderId.HasValue)
+            throw new InvalidOperationException("Não há pedido para cancelar.");
+        
+        await orderService.CancelOrderAsync(_orderId.Value);
+        
+        // Remover Order ID do localStorage
+        await _jsRuntime.InvokeAsync<object>(
+            "localStorage.removeItem", OrderIdKey);
+        
+        _orderId = null;
     }
     
     private async Task SaveCartAsync()

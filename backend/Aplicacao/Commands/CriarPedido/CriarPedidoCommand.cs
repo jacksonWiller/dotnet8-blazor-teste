@@ -1,5 +1,6 @@
 using Aplicacao.Commands.CriarPedido;
 using Ardalis.Result;
+using Dominio.Dtos;
 using MediatR;
 
 namespace Aplicacao.Commands.CriarPedido

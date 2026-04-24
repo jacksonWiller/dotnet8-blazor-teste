@@ -8,7 +8,7 @@ namespace Dominio.Entidades
     public class Pedido : EntidadeBase
     {
         public Guid Id { get; private set; }
-        public List<PedidoItem> Itens { get; private set; }
+        public List<PedidoItem> Itens { get; private set; } = [];
         public decimal Subtotal { get; private set; }
         public decimal Desconto { get; private set; }
         public decimal Total { get; private set; }
@@ -48,7 +48,7 @@ namespace Dominio.Entidades
         /// </summary>
         private void ValidarItem(Item item)
         {
-            if (item.Categoria.Contains("Sanduíche") && TemSanduiche())
+            if (item.Categoria.Contains("Sanduiche") && TemSanduiche())
                 throw new ArgumentException("Não é permitido adicionar mais de um sanduíche ao pedido.");
 
             if (item.Categoria.Contains("Acompanhamento") && TemAcompanhamento())
@@ -61,7 +61,7 @@ namespace Dominio.Entidades
         /// <summary>
         /// Verifica se o pedido já tem um sanduíche
         /// </summary>
-        private bool TemSanduiche() => Itens.Any(i => i.Categoria.Contains("Sanduíche"));
+        private bool TemSanduiche() => Itens.Any(i => i.Categoria.Contains("Sanduiche"));
 
         /// <summary>
         /// Verifica se o pedido já tem acompanhamento

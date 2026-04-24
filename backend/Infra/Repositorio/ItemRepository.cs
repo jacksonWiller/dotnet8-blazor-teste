@@ -129,7 +129,7 @@ namespace Infra.Repositorio
             }
 
             return await _dataContext.Items
-                .Where(i => itemIds.Contains(i.Id) && i.Removido)
+                .Where(i => itemIds.Contains(i.Id) && i.Removido == false)
                 .AsNoTracking()
                 .ToListAsync();
         }

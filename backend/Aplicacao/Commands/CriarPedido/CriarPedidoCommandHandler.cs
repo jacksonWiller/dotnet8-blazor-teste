@@ -64,6 +64,8 @@ namespace Aplicacao.Commands.CriarPedido
                 }
             }
 
+            //adicionar pedido no banco de dadops usando o repositorio
+
             var response = new CriarPedidoCommandResponse
             {
                 PedidoId = pedido.Id,

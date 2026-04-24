@@ -7,6 +7,8 @@ DELETE FROM "Endereco";
 DELETE FROM "Email";
 DELETE FROM "Documento";
 DELETE FROM "Itens";
+DELETE FROM "Pedidos";
+DELETE FROM "ItensCardapio";
 
 -- =========================================
 -- TABELAS
@@ -71,6 +73,47 @@ CREATE INDEX IF NOT EXISTS "IX_Clientes_DocumentoId" ON "Clientes" ("DocumentoId
 CREATE INDEX IF NOT EXISTS "IX_Clientes_EmailId" ON "Clientes" ("EmailId");
 CREATE INDEX IF NOT EXISTS "IX_Clientes_EnderecoId" ON "Clientes" ("EnderecoId");
 CREATE INDEX IF NOT EXISTS "IX_Clientes_TelefoneId" ON "Clientes" ("TelefoneId");
+
+-- =========================================
+-- TABELA: ITENS CARDÁPIO
+-- =========================================
+CREATE TABLE IF NOT EXISTS "ItensCardapio" (
+    "Id" uuid NOT NULL,
+    "Nome" text NOT NULL,
+    "Categoria" integer NOT NULL,
+    "Preco" decimal(18,2) NOT NULL,
+    CONSTRAINT "PK_ItensCardapio" PRIMARY KEY ("Id")
+);
+
+-- =========================================
+-- TABELA: PEDIDOS
+-- =========================================
+CREATE TABLE IF NOT EXISTS "Pedidos" (
+    "Id" uuid NOT NULL,
+    "Subtotal" decimal(18,2) NOT NULL,
+    "Desconto" decimal(18,2) NOT NULL,
+    "Total" decimal(18,2) NOT NULL,
+    "DataCriacao" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_Pedidos" PRIMARY KEY ("Id")
+);
+
+CREATE INDEX IF NOT EXISTS "IX_Pedidos_DataCriacao" ON "Pedidos" ("DataCriacao");
+
+-- =========================================
+-- DADOS: ITENS CARDÁPIO
+-- =========================================
+INSERT INTO "ItensCardapio" ("Id", "Nome", "Categoria", "Preco")
+VALUES
+  -- Sanduíches
+  ('a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1', 'X Burger', 1, 5.00),
+  ('a2a2a2a2-a2a2-a2a2-a2a2-a2a2a2a2a2a2', 'X Egg', 1, 4.50),
+  ('a3a3a3a3-a3a3-a3a3-a3a3-a3a3a3a3a3a3', 'X Bacon', 1, 7.00),
+  
+  -- Acompanhamentos
+  ('b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1', 'Batata frita', 2, 2.00),
+  
+  -- Bebidas
+  ('c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c1c1c1', 'Refrigerante', 3, 2.50);
 
 -- =========================================
 -- TABELA: ITENS

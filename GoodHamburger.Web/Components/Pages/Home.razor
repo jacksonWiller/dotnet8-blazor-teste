@@ -3,12 +3,15 @@
 @using GoodHamburger.Web.Services
 @inject NavigationManager Navigation
 @inject IItemService ItemService
+@inject ICartService CartService
 @rendermode InteractiveServer
 
 @code {
     private List<ItemDto> items = new();
     private bool loading = true;
     private string? errorMessage;
+    private string? notificationMessage;
+    private bool showNotification = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -146,7 +149,7 @@
                     <p>@item.Descricao</p>
                     <div class="card-footer">
                         <span class="price">@FormatPrice(item.Preco)</span>
-                        <button class="add-btn">
+                        <button class="add-btn" @onclick="() => AddToCartAsync(item)">
                             <i class="bi bi-cart-plus"></i> Add
                         </button>
                     </div>
@@ -156,15 +159,51 @@
     }
 </section>
 
+@if (showNotification)
+{
+    <div class="notification">
+        <i class="bi bi-check-circle-fill"></i>
+        <span>@notificationMessage</span>
+        <button @onclick="HideNotification" class="close-btn">&times;</button>
+    </div>
+}
+
+<a class="floating-btn" href="#menu">🍴</a>
+
 @code {
+    private async Task AddToCartAsync(ItemDto item)
+    {
+        try
+        {
+            await CartService.AddItemAsync(item);
+            notificationMessage = $"{item.Nome} adicionado ao carrinho!";
+            showNotification = true;
+        }
+        catch (InvalidOperationException ex)
+        {
+            notificationMessage = ex.Message;
+            showNotification = true;
+        }
+        catch (Exception ex)
+        {
+            notificationMessage = $"Erro ao adicionar item: {ex.Message}";
+            showNotification = true;
+        }
+    }
+
+    private void HideNotification()
+    {
+        showNotification = false;
+    }
+
     private string GetIconForType(string tipo)
     {
         return tipo.ToLower() switch
         {
-            "burger" => "burger",
-            "side" => "dish-fill",
-            "drink" => "cup-hot-fill",
-            "dessert" => "ice-cream",
+            "sanduiche" or "burger" or "hamburguer" => "burger",
+            "acompanhamento" or "side" or "fritura" => "dish-fill",
+            "bebida" or "drink" or "refrigerante" => "cup-hot-fill",
+            "sobremesa" or "dessert" => "ice-cream",
             _ => "emoji-smile"
         };
     }

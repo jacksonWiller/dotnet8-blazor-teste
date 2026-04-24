@@ -1,0 +1,141 @@
+@page "/order/confirm/{orderId:guid}"
+@using GoodHamburger.Web.Components.Models
+@using GoodHamburger.Web.Services
+@inject NavigationManager Navigation
+@inject IOrderService OrderService
+@rendermode InteractiveServer
+
+<PageTitle>Confirmação do Pedido - Good Hamburger</PageTitle>
+
+<div class="order-confirmation-page">
+    @if (loading)
+    {
+        <div class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Carregando detalhes do pedido...</p>
+        </div>
+    }
+    else if (order == null)
+    {
+        <div class="error-message">
+            <i class="bi bi-exclamation-triangle"></i>
+            <h2>Pedido não encontrado</h2>
+            <p>O pedido que você está procurando não foi encontrado.</p>
+            <button @onclick="NavigateToHome" class="btn btn-primary">
+                <i class="bi bi-burger"></i> Voltar ao Início
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="order-confirmation">
+            <div class="confirmation-header">
+                <i class="bi bi-check-circle-fill"></i>
+                <h1>Pedido Confirmado!</h1>
+                <p>Obrigado pela sua compra, seu pedido está sendo preparado!</p>
+            </div>
+
+            <div class="order-info-card">
+                <div class="order-header">
+                    <div class="order-id">
+                        <span class="label">Número do Pedido:</span>
+                        <span class="value">@order.PedidoId.ToString().ToUpper()</span>
+                    </div>
+                    <div class="order-date">
+                        <i class="bi bi-calendar"></i>
+                        <span>@order.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    <h3>Itens do Pedido</h3>
+                    @foreach (var item in order.Itens)
+                    {
+                        <div class="order-item">
+                            <div class="item-info">
+                                <span class="item-quantity">@item.Quantidade x</span>
+                                <span class="item-name">@item.ItemNome</span>
+                                <span class="item-category">@item.Categoria</span>
+                            </div>
+                            <div class="item-price">
+                                @item.Subtotal.ToString("C2")
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="order-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span>@order.Subtotal.ToString("C2")</span>
+                    </div>
+                    @if (order.Desconto > 0)
+                    {
+                        <div class="total-row discount">
+                            <span>Desconto</span>
+                            <span>- @order.Desconto.ToString("C2")</span>
+                        </div>
+                    }
+                    <div class="total-row divider"></div>
+                    <div class="total-row final">
+                        <span>Total</span>
+                        <span class="total-amount">@order.Total.ToString("C2")</span>
+                    </div>
+                </div>
+
+                <div class="delivery-info">
+                    <i class="bi bi-clock"></i>
+                    <span>Tempo estimado de entrega: 25-35 minutos</span>
+                </div>
+            </div>
+
+            <div class="confirmation-actions">
+                <button @onclick="NavigateToHome" class="btn btn-primary btn-lg">
+                    <i class="bi bi-burger"></i> Fazer Novo Pedido
+                </button>
+                <button @onclick="NavigateToOrders" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-list"></i> Meus Pedidos
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool loading = true;
+    private OrderResponse? order;
+
+    [Parameter]
+    public Guid OrderId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrderAsync();
+    }
+
+    private async Task LoadOrderAsync()
+    {
+        try
+        {
+            order = await OrderService.GetOrderByIdAsync(OrderId);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading order: {ex}");
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private void NavigateToOrders()
+    {
+        Navigation.NavigateTo("/orders");
+    }
+}

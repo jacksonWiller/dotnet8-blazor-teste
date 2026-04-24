@@ -41,7 +41,7 @@ namespace Infra.Repositorio
             var fopRequest = FopExpressionBuilder<Item>.Build(filter, order, pageNumber, pageSize);
 
             var query = _dataContext.Items
-                .Where(x => x.Removido)
+                .Where(x => x.Removido == false)
                 .AsNoTracking();
 
             var (filteredItens, totalRecords) = query

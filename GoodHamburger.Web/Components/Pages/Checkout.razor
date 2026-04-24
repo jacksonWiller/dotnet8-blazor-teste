@@ -1,202 +1,236 @@
 @page "/checkout"
 @using GoodHamburger.Web.Components.Models
-@inject NavigationManager NavigationManager
+@using GoodHamburger.Web.Services
+@inject NavigationManager Navigation
+@inject ICartService CartService
+@inject IOrderService OrderService
+@rendermode InteractiveServer
 
-<PageTitle>Checkout - Burger HQ</PageTitle>
+<PageTitle>Checkout - Good Hamburger</PageTitle>
 
 <div class="checkout-page">
-    <!-- Header de Alerta -->
-    @if (showDuplicateAlert)
+    @if (loading)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <span>Duplicate Item Detected: You already have a 'Double Cheese Melt' in your cart.</span>
-            <button type="button" class="btn-close" @onclick="CloseAlert"></button>
+        <div class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
         </div>
     }
+    else if (errorMessage != null)
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span>@errorMessage</span>
+            <button @onclick="NavigateToCart" class="btn btn-sm btn-light mt-2">Voltar ao Carrinho</button>
+        </div>
+    }
+    else if (orderCreated)
+    {
+        <div class="order-success">
+            <i class="bi bi-check-circle-fill"></i>
+            <h2>Pedido Criado com Sucesso!</h2>
+            <p>Obrigado pela sua compra!</p>
+            <div class="order-details">
+                <p><strong>ID do Pedido:</strong> @orderResponse?.PedidoId</p>
+                <p><strong>Total:</strong> @orderResponse?.Total.ToString("C2")</p>
+            </div>
+            <button @onclick="NavigateToHome" class="btn btn-primary">
+                <i class="bi bi-burger"></i> Fazer Novo Pedido
+            </button>
+        </div>
+    }
+    else if (CartService.Items.Any() == false)
+    {
+        <div class="empty-cart">
+            <i class="bi bi-cart-x"></i>
+            <h2>Seu carrinho está vazio</h2>
+            <p>Adicione itens antes de finalizar o pedido.</p>
+            <button @onclick="NavigateToCart" class="btn btn-primary">
+                <i class="bi bi-cart"></i> Ir para o Carrinho
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="container-fluid py-4">
+            <h1 class="mb-4">Finalizar Pedido</h1>
 
-    <div class="container-fluid py-4">
-        <h1 class="mb-4">Resumo do Pedido</h1>
-
-        <div class="row">
-            <!-- Lista de Itens do Carrinho -->
-            <div class="col-lg-7">
-                <div class="cart-items">
-                    @foreach (var item in cartItems)
-                    {
-                        <div class="cart-item-card">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <img src="@item.ImageUrl" alt="@item.Name" class="cart-item-image" />
-                                    @if (item.IsComboDeal)
-                                    {
-                                        <span class="combo-badge">COMBO DEAL</span>
-                                    }
-                                </div>
-                                <div class="col-md-6">
-                                    <h5 class="item-name">@item.Name</h5>
-                                    <p class="item-description">@item.Description</p>
-                                </div>
-                                <div class="col-md-3 text-md-end">
-                                    <span class="item-price">$@item.Price.ToString("F2")</span>
-                                </div>
-                                <div class="col-12">
-                                    <div class="quantity-control d-flex align-items-center justify-content-between justify-content-md-center gap-3">
-                                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => DecreaseQuantity(item)">
-                                            <i class="bi bi-dash"></i>
-                                        </button>
-                                        <span class="quantity-value">@item.Quantity</span>
-                                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => IncreaseQuantity(item)">
-                                            <i class="bi bi-plus"></i>
-                                        </button>
-                                        <a href="#" class="remove-link" @onclick="() => RemoveItem(item)">
-                                            <i class="bi bi-trash"></i> Remove
-                                        </a>
+            <div class="row">
+                <!-- Lista de Itens do Carrinho -->
+                <div class="col-lg-7">
+                    <div class="cart-items">
+                        @foreach (var item in CartService.Items)
+                        {
+                            <div class="cart-item-card">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        @if (!string.IsNullOrEmpty(item.UrlImagem))
+                                        {
+                                            <img src="@item.UrlImagem" alt="@item.Nome" class="cart-item-image" />
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-@item.Icon"></i>
+                                        }
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 class="item-name">@item.Nome</h5>
+                                        <p class="item-description">@item.Descricao</p>
+                                        <small class="text-muted">@item.Categoria</small>
+                                    </div>
+                                    <div class="col-md-3 text-md-end">
+                                        <span class="item-price">@item.Preco.ToString("C2")</span>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="quantity-control d-flex align-items-center justify-content-between justify-content-md-center gap-3">
+                                            <button class="btn btn-outline-secondary btn-sm" @onclick="() => DecreaseQuantityAsync(item.ItemId)">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <span class="quantity-value">@item.Quantity</span>
+                                            <button class="btn btn-outline-secondary btn-sm" @onclick="() => IncreaseQuantityAsync(item.ItemId)">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                            <a href="#" class="remove-link" @onclick="() => RemoveItemAsync(item.ItemId)">
+                                                <i class="bi bi-trash"></i> Remover
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
 
-                    <!-- Botão para continuar comprando -->
-                    <div class="continue-shopping mt-4">
-                        <button class="btn btn-outline-primary w-100">
-                            <i class="bi bi-plus-circle"></i> Browse more delicious options
-                        </button>
+                        <!-- Botão para continuar comprando -->
+                        <div class="continue-shopping mt-4">
+                            <button class="btn btn-outline-primary w-100" @onclick="NavigateToCart">
+                                <i class="bi bi-plus-circle"></i> Continuar Comprando
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Resumo do Pedido -->
-            <div class="col-lg-5">
-                <div class="order-summary">
-                    <h5 class="mb-4">Resumo</h5>
+                <!-- Resumo do Pedido -->
+                <div class="col-lg-5">
+                    <div class="order-summary">
+                        <h5 class="mb-4">Resumo</h5>
 
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span>$@subtotal.ToString("F2")</span>
-                    </div>
-
-                    @if (hasComboDiscount)
-                    {
-                        <div class="summary-row discount">
-                            <span><i class="bi bi-tag"></i> Combo Discount (20%)</span>
-                            <span>-$@comboDiscount.ToString("F2")</span>
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>@CartService.Subtotal.ToString("C2")</span>
                         </div>
-                    }
 
-                    <div class="summary-row">
-                        <span>Delivery Fee</span>
-                        <span>$@deliveryFee.ToString("F2")</span>
-                    </div>
-
-                    <div class="summary-total">
-                        <span>Total</span>
-                        <div>
-                            <span class="total-price">$@total.ToString("F2")</span>
-                            <span class="estimated-delivery">Estimated delivery: 25-35 min</span>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-confirm-order w-100 mt-4">
-                        Confirm Order <i class="bi bi-arrow-right"></i>
-                    </button>
-
-                    <p class="terms-text mt-3 text-center">
-                        By clicking confirm, you agree to our Terms of Service.
-                    </p>
-
-                    <!-- Método de Pagamento -->
-                    <div class="payment-method mt-4">
-                        <h6 class="text-uppercase text-muted mb-3">Payment Method</h6>
-                        <div class="payment-card">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-credit-card"></i>
-                                <span class="ms-2">Visa ending in 4421</span>
+                        @if (CartService.Discount > 0)
+                        {
+                            <div class="summary-row discount">
+                                <span><i class="bi bi-tag"></i> Desconto</span>
+                                <span>- @CartService.Discount.ToString("C2")</span>
                             </div>
-                            <a href="#" class="change-link">Change</a>
-                        </div>
-                    </div>
+                        }
 
-                    <!-- Programa de Fidelidade -->
-                    <div class="loyalty-banner mt-4">
-                        <div class="loyalty-content">
-                            <i class="bi bi-star-fill"></i>
-                            <div class="loyalty-text">
-                                <strong>Join Burger Rewards</strong>
-                                <span>Earn 50 points with this order!</span>
+                        <div class="summary-row">
+                            <span>Taxa de Entrega</span>
+                            <span>@CartService.DeliveryFee.ToString("C2")</span>
+                        </div>
+
+                        <div class="summary-total">
+                            <span>Total</span>
+                            <div>
+                                <span class="total-price">@CartService.Total.ToString("C2")</span>
+                                <span class="estimated-delivery">Entrega estimada: 25-35 min</span>
                             </div>
                         </div>
+
+                        <button class="btn btn-confirm-order w-100 mt-4" @onclick="PlaceOrderAsync" disabled="@placingOrder">
+                            @if (placingOrder)
+                            {
+                                <span><i class="bi bi-hourglass-split"></i> Processando...</span>
+                            }
+                            else
+                            {
+                                <span>Confirmar Pedido <i class="bi bi-arrow-right"></i></span>
+                            }
+                        </button>
+
+                        <p class="terms-text mt-3 text-center">
+                            Ao clicar em confirmar, você concorda com nossos Termos de Serviço.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
 </div>
 
 @code {
-    private bool showDuplicateAlert = true;
-    private decimal subtotal = 59.00m;
-    private decimal comboDiscount = 11.80m;
-    private decimal deliveryFee = 3.50m;
-    private decimal total = 50.70m;
-    private bool hasComboDiscount = true;
+    private bool loading = true;
+    private bool orderCreated = false;
+    private bool placingOrder = false;
+    private string? errorMessage;
+    private OrderResponse? orderResponse;
 
-    private List<CartItem> cartItems = new()
+    protected override async Task OnInitializedAsync()
     {
-        new CartItem
-        {
-            Id = 1,
-            Name = "Double Cheese Melt",
-            Description = "2x Wagyu Beef, Triple Cheddar, Caramelized Onions",
-            Price = 18.50m,
-            Quantity = 2,
-            ImageUrl = "/images/double-cheese-melt.jpg",
-            IsComboDeal = false
-        },
-        new CartItem
-        {
-            Id = 2,
-            Name = "Bacon BBQ Combo",
-            Description = "Includes Large Fries & Craft Soda",
-            Price = 22.00m,
-            Quantity = 1,
-            ImageUrl = "/images/bacon-bbq-combo.jpg",
-            IsComboDeal = true
-        }
-    };
-
-    private void CloseAlert()
-    {
-        showDuplicateAlert = false;
+        await CartService.InitializeCartAsync();
+        loading = false;
     }
 
-    private void IncreaseQuantity(CartItem item)
+    private async Task IncreaseQuantityAsync(Guid itemId)
     {
-        item.Quantity++;
-        RecalculateTotals();
-    }
-
-    private void DecreaseQuantity(CartItem item)
-    {
-        if (item.Quantity > 1)
+        var item = CartService.Items.FirstOrDefault(i => i.ItemId == itemId);
+        if (item != null)
         {
-            item.Quantity--;
-            RecalculateTotals();
+            await CartService.UpdateQuantityAsync(itemId, item.Quantity + 1);
         }
     }
 
-    private void RemoveItem(CartItem item)
+    private async Task DecreaseQuantityAsync(Guid itemId)
     {
-        cartItems.Remove(item);
-        RecalculateTotals();
+        var item = CartService.Items.FirstOrDefault(i => i.ItemId == itemId);
+        if (item != null && item.Quantity > 1)
+        {
+            await CartService.UpdateQuantityAsync(itemId, item.Quantity - 1);
+        }
     }
 
-    private void RecalculateTotals()
+    private async Task RemoveItemAsync(Guid itemId)
     {
-        subtotal = cartItems.Sum(i => i.Price * i.Quantity);
-        hasComboDiscount = cartItems.Any(i => i.IsComboDeal);
-        comboDiscount = hasComboDiscount ? subtotal * 0.20m : 0;
-        total = subtotal - comboDiscount + deliveryFee;
+        await CartService.RemoveItemAsync(itemId);
+    }
+
+    private async Task PlaceOrderAsync()
+    {
+        try
+        {
+            placingOrder = true;
+            errorMessage = null;
+
+            // Obter IDs dos itens do carrinho
+            var itemIds = CartService.Items.Select(i => i.ItemId).ToList();
+
+            // Criar pedido via API
+            orderResponse = await OrderService.CreateOrderAsync(itemIds);
+            orderCreated = true;
+
+            // Limpar carrinho após pedido criado
+            await CartService.ClearCartAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erro ao criar pedido: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"Error: {ex}");
+        }
+        finally
+        {
+            placingOrder = false;
+        }
+    }
+
+    private void NavigateToCart()
+    {
+        Navigation.NavigateTo("/cart");
+    }
+
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/");
     }
 }

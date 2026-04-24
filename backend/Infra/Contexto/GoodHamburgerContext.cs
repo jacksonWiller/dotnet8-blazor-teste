@@ -12,6 +12,7 @@ public class GoodHamburgerContext(DbContextOptions<GoodHamburgerContext> dbOptio
     public DbSet<Email> Emails { get; set; }
     public DbSet<Endereco> Enderecos { get; set; }
     public DbSet<Telefone> Telefones { get; set; }
+    public DbSet<Item> Itens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,6 +23,7 @@ public class GoodHamburgerContext(DbContextOptions<GoodHamburgerContext> dbOptio
         modelBuilder.Entity<Email>().ToTable("Email");
         modelBuilder.Entity<Endereco>().ToTable("Endereco");
         modelBuilder.Entity<Telefone>().ToTable("Telefone");
+        modelBuilder.Entity<Item>().ToTable("Itens");
         
         modelBuilder.Entity<Cliente>()
             .HasOne(c => c.Documento)

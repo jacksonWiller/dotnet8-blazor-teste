@@ -6,6 +6,7 @@ DELETE FROM "Telefone";
 DELETE FROM "Endereco";
 DELETE FROM "Email";
 DELETE FROM "Documento";
+DELETE FROM "Itens";
 
 -- =========================================
 -- TABELAS
@@ -70,6 +71,230 @@ CREATE INDEX IF NOT EXISTS "IX_Clientes_DocumentoId" ON "Clientes" ("DocumentoId
 CREATE INDEX IF NOT EXISTS "IX_Clientes_EmailId" ON "Clientes" ("EmailId");
 CREATE INDEX IF NOT EXISTS "IX_Clientes_EnderecoId" ON "Clientes" ("EnderecoId");
 CREATE INDEX IF NOT EXISTS "IX_Clientes_TelefoneId" ON "Clientes" ("TelefoneId");
+
+-- =========================================
+-- TABELA: ITENS
+-- =========================================
+CREATE TABLE IF NOT EXISTS "Itens" (
+    "Id" uuid NOT NULL,
+    "Nome" text NOT NULL,
+    "Descricao" text NOT NULL,
+    "Preco" decimal(18,2) NOT NULL,
+    "Tipo" text NOT NULL,
+    "Categoria" text NOT NULL,
+    "UrlImagem" text,
+    "Ativo" boolean NOT NULL,
+    CONSTRAINT "PK_Itens" PRIMARY KEY ("Id")
+);
+
+CREATE INDEX IF NOT EXISTS "IX_Itens_Tipo" ON "Itens" ("Tipo");
+CREATE INDEX IF NOT EXISTS "IX_Itens_Categoria" ON "Itens" ("Categoria");
+
+-- =========================================
+-- DADOS: ITENS
+-- =========================================
+INSERT INTO "Itens" ("Id", "Nome", "Descricao", "Preco", "Tipo", "Categoria", "UrlImagem", "Ativo")
+VALUES
+  -- Hamburgueres
+  (
+    'a1a1a1a1-b1b1-c1c1-d1d1-e1e1e1e1e1e1',
+    'X-Burger Clássico',
+    'Hambúrguer de 180g, queijo cheddar, alface, tomate e molho especial',
+    25.90,
+    'burger',
+    'Hambúrgueres',
+    'https://example.com/images/x-burger-classico.jpg',
+    TRUE
+  ),
+  (
+    'a2a2a2a2-b2b2-c2c2-d2d2-e2e2e2e2e2e2',
+    'X-Bacon Crunch',
+    'Hambúrguer de 180g, queijo cheddar, bacon crocante, cebola caramelizada e BBQ',
+    29.90,
+    'burger',
+    'Hambúrgueres',
+    'https://example.com/images/x-bacon-crunch.jpg',
+    TRUE
+  ),
+  (
+    'a3a3a3a3-b3b3-c3c3-d3d3-e3e3e3e3e3e3',
+    'X-Salada Premium',
+    'Hambúrguer de 200g, queijo prato, alface americana, tomate italiano e maionese da casa',
+    27.50,
+    'burger',
+    'Hambúrgueres',
+    'https://example.com/images/x-salada-premium.jpg',
+    TRUE
+  ),
+  (
+    'a4a4a4a4-b4b4-c4c4-d4d4-e4e4e4e4e4e4',
+    'Chicken Burger',
+    'Filé de frango empanado, alface, maionese de ervas e queijo mussarela',
+    23.90,
+    'burger',
+    'Hambúrgueres',
+    'https://example.com/images/chicken-burger.jpg',
+    TRUE
+  ),
+  (
+    'a5a5a5a5-b5b5-c5c5-d5d5-e5e5e5e5e5e5',
+    'Veggie Burger',
+    'Hambúrguer de grão de bico, alface, tomate, cebola roxa e molho de iogurte',
+    26.90,
+    'burger',
+    'Hambúrgueres',
+    'https://example.com/images/veggie-burger.jpg',
+    TRUE
+  ),
+  
+  -- Acompanhamentos
+  (
+    'b1b1b1b1-b1b1-c1c1-d1d1-e1e1e1e1e1e1',
+    'Batata Frita Tradicional',
+    'Porção de 300g de batatas fritas crocantes com sal',
+    15.90,
+    'side',
+    'Acompanhamentos',
+    'https://example.com/images/batata-frita.jpg',
+    TRUE
+  ),
+  (
+    'b2b2b2b2-b2b2-c2c2-d2d2-e2e2e2e2e2e2',
+    'Batata Frita com Cheddar',
+    'Batatas fritas cobertas com cheddar derretido e bacon',
+    19.90,
+    'side',
+    'Acompanhamentos',
+    'https://example.com/images/batata-cheddar.jpg',
+    TRUE
+  ),
+  (
+    'b3b3b3b3-b3b3-c3c3-d3d3-e3e3e3e3e3e3',
+    'Onion Rings',
+    'Anéis de cebola empanados e super crocantes (8 unidades)',
+    17.90,
+    'side',
+    'Acompanhamentos',
+    'https://example.com/images/onion-rings.jpg',
+    TRUE
+  ),
+  (
+    'b4b4b4b4-b4b4-c4c4-d4d4-e4e4e4e4e4e4',
+    'Mandioca Frita',
+    'Porção de 400g de mandioca frita com alho e sal',
+    16.90,
+    'side',
+    'Acompanhamentos',
+    'https://example.com/images/mandioca-frita.jpg',
+    TRUE
+  ),
+  
+  -- Bebidas
+  (
+    'c1c1c1c1-c1c1-c1c1-d1d1-e1e1e1e1e1e1',
+    'Coca-Cola Lata',
+    'Lata 350ml bem geladinha',
+    6.00,
+    'drink',
+    'Bebidas',
+    'https://example.com/images/coca-cola.jpg',
+    TRUE
+  ),
+  (
+    'c2c2c2c2-c2c2-c2c2-d2d2-e2e2e2e2e2e2',
+    'Guaraná Antarctica Lata',
+    'Lata 350ml bem geladinha',
+    6.00,
+    'drink',
+    'Bebidas',
+    'https://example.com/images/guarana.jpg',
+    TRUE
+  ),
+  (
+    'c3c3c3c3-c3c3-c3c3-d3d3-e3e3e3e3e3e3',
+    'Suco de Laranja Natural',
+    'Copo 500ml',
+    9.00,
+    'drink',
+    'Bebidas',
+    'https://example.com/images/suco-laranja.jpg',
+    TRUE
+  ),
+  (
+    'c4c4c4c4-c4c4-c4c4-d4d4-e4e4e4e4e4e4',
+    'Água Sem Gás',
+    'Copo 300ml',
+    4.00,
+    'drink',
+    'Bebidas',
+    NULL,
+    TRUE
+  ),
+  
+  -- Sobremesas
+  (
+    'd1d1d1d1-d1d1-c1c1-d1d1-e1e1e1e1e1e1',
+    'Milkshake de Chocolate',
+    '300ml com chantilly e granulado',
+    18.90,
+    'dessert',
+    'Sobremesas',
+    'https://example.com/images/milkshake-chocolate.jpg',
+    TRUE
+  ),
+  (
+    'd2d2d2d2-d2d2-c2c2-d2d2-e2e2e2e2e2e2',
+    'Milkshake de Morango',
+    '300ml com chantilly e calda de morango',
+    18.90,
+    'dessert',
+    'Sobremesas',
+    'https://example.com/images/milkshake-morango.jpg',
+    TRUE
+  ),
+  (
+    'd3d3d3d3-d3d3-c3c3-d3d3-e3e3e3e3e3e3',
+    'Brownie com Sorvete',
+    'Brownie quente com bola de sorvete de creme',
+    22.90,
+    'dessert',
+    'Sobremesas',
+    'https://example.com/images/brownie.jpg',
+    TRUE
+  ),
+  
+  -- Combos
+  (
+    'e1e1e1e1-e1e1-c1c1-d1d1-e1e1e1e1e1e1',
+    'Combo Individual',
+    'X-Burger + Batata Frita Média + Coca-Cola Lata',
+    38.90,
+    'combo',
+    'Combos',
+    'https://example.com/images/combo-individual.jpg',
+    TRUE
+  ),
+  (
+    'e2e2e2e2-e2e2-c2c2-d2d2-e2e2e2e2e2e2',
+    'Combo Casal',
+    '2 X-Burgers + 2 Batatas Fritas Médias + 2 Coca-Colas Lata',
+    72.90,
+    'combo',
+    'Combos',
+    'https://example.com/images/combo-casal.jpg',
+    TRUE
+  ),
+  (
+    'e3e3e3e3-e3e3-c3c3-d3d3-e3e3e3e3e3e3',
+    'Combo Família',
+    '4 X-Burgers + 2 Batatas Fritas Grandes + 2 Onion Rings + 2 Litros de Coca-Cola',
+    119.90,
+    'combo',
+    'Combos',
+    'https://example.com/images/combo-familia.jpg',
+    TRUE
+  )
+  ;
 
 -- =========================================
 -- DADOS: DOCUMENTO

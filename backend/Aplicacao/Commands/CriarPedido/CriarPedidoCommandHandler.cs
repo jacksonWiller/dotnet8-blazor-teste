@@ -16,13 +16,16 @@ namespace Aplicacao.Commands.CriarPedido
     {
         private readonly IValidator<CriarPedidoCommand> _validator;
         private readonly IItemRepository _itemRepository;
+        private readonly IPedidoRepository _pedidoRepository;
 
         public CriarPedidoCommandHandler(
             IValidator<CriarPedidoCommand> validator,
-            IItemRepository itemRepository)
+            IItemRepository itemRepository,
+            IPedidoRepository pedidoRepository)
         {
             _validator = validator;
             _itemRepository = itemRepository;
+            _pedidoRepository = pedidoRepository;
         }
 
         /// <summary>
@@ -39,7 +42,7 @@ namespace Aplicacao.Commands.CriarPedido
             }
 
             // Criar pedido
-            var pedido = new Pedido();
+            var pedido = new Pedido(Guid.NewGuid());
 
             // Buscar todos os itens de uma vez
             var items = await _itemRepository.GetItemsByIdsAsync(request.ItensIds);
@@ -64,7 +67,7 @@ namespace Aplicacao.Commands.CriarPedido
                 }
             }
 
-            //adicionar pedido no banco de dadops usando o repositorio
+            await _pedidoRepository.AdicionarAsync(pedido);
 
             var response = new CriarPedidoCommandResponse
             {

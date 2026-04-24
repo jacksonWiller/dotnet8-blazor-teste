@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using FluentValidation;
 using Dominio.Eventos;
@@ -7,7 +7,7 @@ namespace Dominio.Entidades
 {
     public class EntidadeBase
     {
-        public Guid Id { get; protected set; }
+        public Guid Id { get; protected set; } = Guid.NewGuid();
 
         [NotMapped]
         private readonly List<EventoBase> _domainEvents = [];

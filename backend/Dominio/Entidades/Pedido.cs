@@ -14,7 +14,7 @@ namespace Dominio.Entidades
         public decimal Total { get; private set; }
         public DateTime DataCriacao { get; private set; }
 
-        public Pedido() { }
+        protected Pedido() { }
 
         /// <summary>
         /// Cria um novo pedido

@@ -15,7 +15,6 @@ public class GoodHamburgerContext(DbContextOptions<GoodHamburgerContext> dbOptio
     {
         base.OnModelCreating(modelBuilder);
         
-        // Configurar entidade Item
         modelBuilder.Entity<Item>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -53,8 +52,43 @@ public class GoodHamburgerContext(DbContextOptions<GoodHamburgerContext> dbOptio
             
             entity.HasIndex(e => e.Tipo);
             entity.HasIndex(e => e.Categoria);
-            
+
             entity.ToTable("Item");
+        });
+        
+
+        modelBuilder.Entity<Pedido>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Id)
+                .HasColumnType("uuid")
+                .HasDefaultValueSql("gen_random_uuid()");
+            
+            entity.Property(e => e.Subtotal)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+            
+            entity.Property(e => e.Desconto)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+            
+            entity.Property(e => e.Total)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+            
+            entity.Property(e => e.DataCriacao)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
+            
+            entity.HasMany(p => p.Itens)
+                .WithOne()
+                .HasForeignKey("PedidoId")
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => e.DataCriacao);
+
+            entity.ToTable("Pedido");
         });
         
         // Configurar entidade PedidoItem
@@ -105,7 +139,7 @@ public class GoodHamburgerContext(DbContextOptions<GoodHamburgerContext> dbOptio
             
             entity.HasIndex(e => e.PedidoId);
             entity.HasIndex(e => e.ItemId);
-            
+
             entity.ToTable("PedidoItem");
         });
     }

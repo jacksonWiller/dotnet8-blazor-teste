@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using Clientes.Dominio.Dtos;
+using Dominio.Dtos;
 using MediatR;
 
 namespace Aplicacao.Queries.GetAllPedidos
@@ -9,5 +9,13 @@ namespace Aplicacao.Queries.GetAllPedidos
     /// </summary>
     public class GetAllPedidosQuery : IRequest<Result<GetAllPedidosQueryResponse>>
     {
+        public int PageNumber { get; }
+        public int PageSize { get; }
+
+        public GetAllPedidosQuery(int pageNumber = 1, int pageSize = 10)
+        {
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+        }
     }
 }

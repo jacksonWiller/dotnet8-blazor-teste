@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using Clientes.Dominio.Dtos;
+using Dominio.Dtos;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
 
@@ -12,5 +12,10 @@ namespace Aplicacao.Queries.GetPedidoById
     {
         [Required(ErrorMessage = "O ID do pedido é obrigatório.")]
         public Guid Id { get; set; }
+
+        public GetPedidoByIdQuery(Guid id)
+        {
+            Id = id;
+        }
     }
 }

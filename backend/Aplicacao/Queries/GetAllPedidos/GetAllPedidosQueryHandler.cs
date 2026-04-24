@@ -1,7 +1,7 @@
 using Ardalis.Result;
-using Clientes.Aplicacao.Queries.GetAllPedidos;
-using Clientes.Dominio.Dtos;
-using Clientes.Dominio.Interfaces;
+using Aplicacao.Queries.GetAllPedidos;
+using Dominio.Dtos;
+using Dominio.Interfaces;
 using MediatR;
 
 namespace Aplicacao.Queries.GetAllPedidos
@@ -25,32 +25,17 @@ namespace Aplicacao.Queries.GetAllPedidos
             GetAllPedidosQuery request,
             CancellationToken cancellationToken)
         {
-            var pedidos = await _pedidoRepository.GetAllAsync();
+            var (pedidos, totalCount) = await _pedidoRepository.GetAllPedidosAsync(request.PageNumber, request.PageSize);
             
-            var pedidosDto = pedidos.Select(pedido =>
+            var response = new GetAllPedidosQueryResponse
             {
-                var pedidoInfo = pedido.ObterInfo();
-                return new PedidoDto
-                {
-                    Id = pedidoInfo.Id,
-                    Itens = pedidoInfo.Itens.Select(i => new PedidoItemDto
-                    {
-                        ItemId = i.ItemId,
-                        Nome = i.Nome,
-                        Categoria = i.Categoria.ToString(),
-                        PrecoUnitario = i.PrecoUnitario
-                    }).ToList(),
-                    Subtotal = pedidoInfo.Subtotal,
-                    Desconto = pedidoInfo.Desconto,
-                    Total = pedidoInfo.Total,
-                    DataCriacao = pedidoInfo.DataCriacao
-                };
-            }).ToList();
+                Pedidos = pedidos,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
 
-            return Result<GetAllPedidosQueryResponse>.Success(new GetAllPedidosQueryResponse
-            {
-                Pedidos = pedidosDto
-            });
+            return Result<GetAllPedidosQueryResponse>.Success(response);
         }
     }
 }

@@ -1,7 +1,7 @@
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
-using Clientes.Aplicacao.Commands.DeletePedido;
-using Clientes.Dominio.Interfaces;
+using Aplicacao.Commands.DeletePedido;
+using Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
 
@@ -37,14 +37,14 @@ namespace Aplicacao.Commands.DeletePedido
             }
 
             // Buscar o pedido existente
-            var pedido = await _pedidoRepository.GetByIdAsync(request.Id);
+            var pedido = await _pedidoRepository.GetPedidoByIdAsync(request.Id);
             if (pedido == null)
             {
                 return Result<DeletePedidoCommandResponse>.NotFound($"Pedido com ID {request.Id} não encontrado.");
             }
 
             // Remover o pedido
-            await _pedidoRepository.DeleteAsync(pedido);
+            await _pedidoRepository.RemoverAsync(request.Id);
 
             var response = new DeletePedidoCommandResponse
             {

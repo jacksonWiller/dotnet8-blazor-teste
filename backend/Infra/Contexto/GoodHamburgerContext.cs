@@ -12,6 +12,7 @@ public class GoodHamburgerContext(DbContextOptions<GoodHamburgerContext> dbOptio
     public DbSet<Endereco> Enderecos { get; set; }
     public DbSet<Telefone> Telefones { get; set; }
     public DbSet<Item> Itens { get; set; }
+    public DbSet<Pedido> Pedidos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

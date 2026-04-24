@@ -1,7 +1,8 @@
 using Ardalis.Result;
-using Clientes.Dominio.Dtos;
-using Clientes.Dominio.Entidades;
-using Clientes.Dominio.Interfaces;
+using Aplicacao.Queries.GetPedidoById;
+using Dominio.Dtos;
+using Dominio.Entidades;
+using Dominio.Interfaces;
 using MediatR;
 
 namespace Aplicacao.Queries.GetPedidoById
@@ -25,27 +26,27 @@ namespace Aplicacao.Queries.GetPedidoById
             GetPedidoByIdQuery request,
             CancellationToken cancellationToken)
         {
-            var pedido = await _pedidoRepository.GetByIdAsync(request.Id);
+            var pedido = await _pedidoRepository.GetPedidoByIdAsync(request.Id);
             if (pedido == null)
             {
                 return Result<GetPedidoByIdQueryResponse>.NotFound($"Pedido com ID {request.Id} não encontrado.");
             }
 
-            var pedidoInfo = pedido.ObterInfo();
             var pedidoDto = new PedidoDto
             {
-                Id = pedidoInfo.Id,
-                Itens = pedidoInfo.Itens.Select(i => new PedidoItemDto
+                Id = pedido.Id,
+                Itens = pedido.Itens.Select(i => new PedidoItemDto
                 {
                     ItemId = i.ItemId,
-                    Nome = i.Nome,
-                    Categoria = i.Categoria.ToString(),
-                    PrecoUnitario = i.PrecoUnitario
+                    ItemNome = i.ItemNome,
+                    Categoria = (int)i.Categoria,
+                    PrecoUnitario = i.PrecoUnitario,
+                    Quantidade = i.Quantidade
                 }).ToList(),
-                Subtotal = pedidoInfo.Subtotal,
-                Desconto = pedidoInfo.Desconto,
-                Total = pedidoInfo.Total,
-                DataCriacao = pedidoInfo.DataCriacao
+                Subtotal = pedido.Subtotal,
+                Desconto = pedido.Desconto,
+                Total = pedido.Total,
+                DataCriacao = pedido.DataCriacao
             };
 
             return Result<GetPedidoByIdQueryResponse>.Success(new GetPedidoByIdQueryResponse

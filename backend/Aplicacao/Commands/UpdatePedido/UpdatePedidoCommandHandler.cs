@@ -1,8 +1,9 @@
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
-using Clientes.Dominio.Dtos;
-using Clientes.Dominio.Entidades;
-using Clientes.Dominio.Interfaces;
+using Aplicacao.Commands.UpdatePedido;
+using Dominio.Dtos;
+using Dominio.Entidades;
+using Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
 
@@ -38,7 +39,7 @@ namespace Aplicacao.Commands.UpdatePedido
             }
 
             // Buscar o pedido existente
-            var pedido = await _pedidoRepository.GetByIdAsync(request.Id);
+            var pedido = await _pedidoRepository.GetPedidoByIdAsync(request.Id);
             if (pedido == null)
             {
                 return Result<UpdatePedidoCommandResponse>.NotFound($"Pedido com ID {request.Id} não encontrado.");

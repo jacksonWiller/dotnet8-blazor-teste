@@ -12,7 +12,6 @@ public class CartItem
     public string Categoria { get; set; } = string.Empty;
     public string Tipo { get; set; } = string.Empty;
     
-    // Propriedades de conveniência para compatibilidade com UI existente
     public string Name => Nome;
     public string Description => Descricao;
     public string Price => Preco.ToString("C2");

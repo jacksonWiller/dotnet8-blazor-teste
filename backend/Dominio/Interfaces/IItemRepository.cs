@@ -8,6 +8,7 @@ namespace Dominio.Interfaces
     /// </summary>
     public interface IItemRepository
     {
+
         /// <summary>
         /// Obtém todos os itens com paginação, filtro e ordenação
         /// </summary>

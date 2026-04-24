@@ -16,13 +16,16 @@ namespace Aplicacao.Commands.UpdatePedido
     {
         private readonly IValidator<UpdatePedidoCommand> _validator;
         private readonly IPedidoRepository _pedidoRepository;
+        private readonly IItemRepository _itemRepository;
 
         public UpdatePedidoCommandHandler(
             IValidator<UpdatePedidoCommand> validator,
-            IPedidoRepository pedidoRepository)
+            IPedidoRepository pedidoRepository,
+            IItemRepository itemRepository)
         {
             _validator = validator;
             _pedidoRepository = pedidoRepository;
+            _itemRepository = itemRepository;
         }
 
         /// <summary>
@@ -35,38 +38,21 @@ namespace Aplicacao.Commands.UpdatePedido
             var validationResult = await _validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
             {
-                return Result<UpdatePedidoCommandResponse>.Invalid(validationResult.AsErrors());
+                return Result.Invalid(validationResult.AsErrors());
             }
 
             // Buscar o pedido existente
             var pedido = await _pedidoRepository.GetPedidoByIdAsync(request.Id);
             if (pedido == null)
             {
-                return Result<UpdatePedidoCommandResponse>.NotFound($"Pedido com ID {request.Id} não encontrado.");
+                return Result.NotFound($"Pedido com ID {request.Id} não encontrado.");
             }
 
-            // Adicionar novos itens ao pedido
-            foreach (var itemId in request.ItensIds)
-            {
-                var itemCardapio = ItemCardapio.GetAllItens().FirstOrDefault(i => i.Id == itemId);
-                
-                if (itemCardapio == null)
-                {
-                    return Result<UpdatePedidoCommandResponse>.NotFound($"Item com ID {itemId} não encontrado no cardápio.");
-                }
 
-                try
-                {
-                    pedido.AdicionarItem(itemCardapio);
-                }
-                catch (ArgumentException ex)
-                {
-                    return Result<UpdatePedidoCommandResponse>.BadRequest(ex.Message);
-                }
-            }
+            var item = await _itemRepository.GetAllItemsAsync(x => x.Id == itemId);
 
             // Salvar alterações
-            await _pedidoRepository.UpdateAsync(pedido);
+            await _pedidoRepository.AtualizarAsync(pedido);
 
             // Obter informações do pedido
             var pedidoInfo = pedido.ObterInfo();
@@ -80,9 +66,10 @@ namespace Aplicacao.Commands.UpdatePedido
                 Itens = pedidoInfo.Itens.Select(i => new Dominio.Dtos.PedidoItemDto
                 {
                     ItemId = i.ItemId,
-                    Nome = i.Nome,
-                    Categoria = i.Categoria.ToString(),
-                    PrecoUnitario = i.PrecoUnitario
+                    ItemNome = i.ItemNome,
+                    Categoria = i.Categoria,
+                    PrecoUnitario = i.PrecoUnitario,
+                    Quantidade = i.Quantidade
                 }).ToList()
             };
 

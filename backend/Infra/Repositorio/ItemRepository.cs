@@ -1,10 +1,11 @@
 using Dominio.Dtos;
 using Dominio.Entidades;
 using Dominio.Interfaces;
-using Infra.Contexto;
 using Fop;
 using Fop.FopExpression;
+using Infra.Contexto;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Infra.Repositorio
 {
@@ -18,6 +19,14 @@ namespace Infra.Repositorio
         public ItemRepository(GoodHamburgerContext dataContext)
         {
             _dataContext = dataContext;
+        }
+
+        public async Task<List<Item>> GetByExpressionAsync(Expression<Func<Item, bool>> predicate)
+        {
+            return await _dataContext.Itens
+                .Where(predicate)   
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         /// <summary>

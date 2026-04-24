@@ -96,6 +96,54 @@ h1:focus {
     }
 }
 
+/* Floating Checkout Button */
+.floating-btn {
+    position: sticky;
+    bottom: 30px;
+    right: 30px;
+    background: #007bff;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    transition: all 0.3s ease;
+    z-index: 999;
+    border: none;
+    cursor: pointer;
+    height: 100px;
+}
+
+.floating-btn:hover {
+    background: #0056b3;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.5);
+}
+
+.checkout-btn {
+    background: #28a745;
+}
+
+.checkout-btn:hover {
+    background: #218838;
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
+}
+
+.cart-count {
+    background: #dc3545;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50%;
+    min-width: 24px;
+    text-align: center;
+}
+
 /* Checkout Page Styles */
 .checkout-page {
     max-width: 1200px;

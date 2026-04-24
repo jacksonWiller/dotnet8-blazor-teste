@@ -1536,20 +1536,52 @@ tbody td {
 }
 
 .floating-btn {
-  position: fixed;
-  right: 26px;
-  bottom: 26px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(180deg, #df5b04, #c94e09);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  box-shadow: 0 16px 30px rgba(201, 78, 9, 0.35);
-  text-decoration: none;
+    position: fixed;
+    bottom: 20px;
+    height: 100px;
+    right: 20px;
+    background: #007bff;
+    color: white;
+    padding: 0.4rem 0.7rem;
+    border-radius: 50px;
+    text-decoration: none;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    transition: all 0.3s ease;
+    z-index: 999;
+    border: none;
+    cursor: pointer;
+}
+
+.floating-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.5);
+}
+
+.checkout-btn {
+    background: #28a745;
+}
+
+.checkout-btn:hover {
+    background: #218838;
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
+}
+
+.cart-count {
+    background: #dc3545;
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.1rem 0.25rem;
+    border-radius: 50%;
+    min-width: 16px;
+    text-align: center;
 }
 
 /* Responsividade */

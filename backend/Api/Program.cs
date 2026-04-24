@@ -6,10 +6,11 @@ using Aplicacao.Queries.GetAllItems;
 using Aplicacao.Queries.GetAllPedidos;
 using Aplicacao.Queries.GetPedidoById;
 using Dominio.Interfaces;
+using FluentValidation;
 using Infra.Contexto;
 using Infra.Repositorio;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,11 +26,13 @@ builder.Services.AddDbContext<GoodHamburgerContext>(options =>
 // Registrar todos os handlers do MediatR automaticamente da assembly Aplicacao
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(AppConfigureServices).Assembly);
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+    cfg.RegisterServicesFromAssembly(typeof(UpdatePedidoCommand).Assembly);
 });
 
 // Registrar todos os validators automaticamente da assembly Aplicacao
-builder.Services.AddValidatorsFromAssembly(typeof(AppConfigureServices).Assembly);
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+builder.Services.AddValidatorsFromAssembly(typeof(UpdatePedidoCommand).Assembly);
 
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();

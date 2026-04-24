@@ -6,7 +6,7 @@ namespace Dominio.Entidades
     public class PedidoItem
     {
         public Guid ItemId { get; private set; }
-        public string ItemNome { get; private set; }
+        public string Nome { get; private set; }
         public string Categoria { get; private set; }
         public decimal PrecoUnitario { get; private set; }
         public int Quantidade { get; private set; }

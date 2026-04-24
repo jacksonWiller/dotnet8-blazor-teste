@@ -1,7 +1,9 @@
 using Aplicacao.Commands.CriarPedido;
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
+using Dominio.Dtos;
 using Dominio.Entidades;
+using Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
 
@@ -13,10 +15,14 @@ namespace Aplicacao.Commands.CriarPedido
     public class CriarPedidoCommandHandler : IRequestHandler<CriarPedidoCommand, Result<CriarPedidoCommandResponse>>
     {
         private readonly IValidator<CriarPedidoCommand> _validator;
+        private readonly IItemRepository _itemRepository;
 
-        public CriarPedidoCommandHandler(IValidator<CriarPedidoCommand> validator)
+        public CriarPedidoCommandHandler(
+            IValidator<CriarPedidoCommand> validator,
+            IItemRepository itemRepository)
         {
             _validator = validator;
+            _itemRepository = itemRepository;
         }
 
         /// <summary>
@@ -38,7 +44,7 @@ namespace Aplicacao.Commands.CriarPedido
             // Adicionar itens ao pedido
             foreach (var itemId in request.ItensIds)
             {
-                var item = CardapioFixo.GetAllItens().FirstOrDefault(i => i.Id == itemId);
+                var item = await _itemRepository.GetItemByIdAsync(itemId);
                 
                 if (item == null)
                 {
@@ -51,23 +57,20 @@ namespace Aplicacao.Commands.CriarPedido
                 }
                 catch (ArgumentException ex)
                 {
-                    return Result<CriarPedidoCommandResponse>.BadRequest(ex.Message);
+                    return Result.Error(ex.Message);
                 }
             }
 
-            // Obter informações do pedido
-            var pedidoInfo = pedido.ObterInfo();
-
             var response = new CriarPedidoCommandResponse
             {
-                PedidoId = pedidoInfo.Id,
-                Subtotal = pedidoInfo.Subtotal,
-                Desconto = pedidoInfo.Desconto,
-                Total = pedidoInfo.Total,
-                Itens = pedidoInfo.Itens.Select(i => new Dominio.Dtos.PedidoItemDto
+                PedidoId = pedido.Id,
+                Subtotal = pedido.Subtotal,
+                Desconto = pedido.Desconto,
+                Total = pedido.Total,
+                Itens = pedido.Itens.Select(i => new PedidoItemDto
                 {
                     ItemId = i.ItemId,
-                    Nome = i.Nome,
+                    ItemNome = i.ItemNome,
                     Categoria = i.Categoria.ToString(),
                     PrecoUnitario = i.PrecoUnitario
                 }).ToList()

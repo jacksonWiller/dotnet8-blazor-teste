@@ -45,9 +45,6 @@ namespace Aplicacao.Commands.UpdatePedido
                 return Result<UpdatePedidoCommandResponse>.NotFound($"Pedido com ID {request.Id} não encontrado.");
             }
 
-            // Limpar itens existentes
-            pedido.LimparItens();
-
             // Adicionar novos itens ao pedido
             foreach (var itemId in request.ItensIds)
             {

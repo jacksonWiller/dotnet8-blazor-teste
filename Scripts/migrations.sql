@@ -100,8 +100,29 @@ CREATE TABLE IF NOT EXISTS "Pedidos" (
 CREATE INDEX IF NOT EXISTS "IX_Pedidos_DataCriacao" ON "Pedidos" ("DataCriacao");
 
 -- =========================================
+-- TABELA: PEDIDO_ITENS
+-- =========================================
+CREATE TABLE IF NOT EXISTS "PedidoItens" (
+    "Id" uuid NOT NULL,
+    "PedidoId" uuid NOT NULL,
+    "ItemId" uuid NOT NULL,
+    "Nome" text NOT NULL,
+    "Categoria" integer NOT NULL,
+    "PrecoUnitario" decimal(18,2) NOT NULL,
+    CONSTRAINT "PK_PedidoItens" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_PedidoItens_Pedidos_PedidoId" FOREIGN KEY ("PedidoId") REFERENCES "Pedidos" ("Id") ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "IX_PedidoItens_PedidoId" ON "PedidoItens" ("PedidoId");
+CREATE INDEX IF NOT EXISTS "IX_PedidoItens_ItemId" ON "PedidoItens" ("ItemId");
+
+-- =========================================
 -- DADOS: ITENS CARDÁPIO
 -- =========================================
+-- Limpar dados existentes
+DELETE FROM "ItensCardapio";
+
+-- Inserir itens do cardápio conforme requisitos
 INSERT INTO "ItensCardapio" ("Id", "Nome", "Categoria", "Preco")
 VALUES
   -- Sanduíches

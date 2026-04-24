@@ -1,10 +1,17 @@
 using GoodHamburger.Web.Components;
+using GoodHamburger.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Add HttpClient for API calls
+builder.Services.AddHttpClient<IItemService, ItemService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7113/");
+});
 
 var app = builder.Build();
 

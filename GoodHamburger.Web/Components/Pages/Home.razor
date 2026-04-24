@@ -1,7 +1,58 @@
 @page "/"
 @using GoodHamburger.Web.Components.Models
+@using GoodHamburger.Web.Services
 @inject NavigationManager Navigation
+@inject IItemService ItemService
 @rendermode InteractiveServer
+
+@code {
+    private List<ItemDto> items = new();
+    private bool loading = true;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadItemsAsync();
+    }
+
+    private async Task LoadItemsAsync()
+    {
+        try
+        {
+            items = await ItemService.GetAllItemsAsync();
+            Console.WriteLine($"========================================");
+            Console.WriteLine($"Total de itens carregados: {items.Count}");
+            Console.WriteLine($"========================================");
+            
+            for (int i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+                Console.WriteLine($"Item {i + 1}:");
+                Console.WriteLine($"  ID: {item.Id}");
+                Console.WriteLine($"  Nome: {item.Nome}");
+                Console.WriteLine($"  Descrição: {item.Descricao}");
+                Console.WriteLine($"  Preço: {item.Preco}");
+                Console.WriteLine($"  Tipo: {item.Tipo}");
+                Console.WriteLine($"  Categoria: {item.Categoria}");
+                Console.WriteLine($"  URL Imagem: {item.UrlImagem}");
+                Console.WriteLine($"  Removido: {item.Removido}");
+                Console.WriteLine($"----------------------------------------");
+            }
+            
+            loading = false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"========================================");
+            Console.WriteLine($"ERRO ao carregar produtos:");
+            Console.WriteLine($"  Mensagem: {ex.Message}");
+            Console.WriteLine($"  Stack: {ex.StackTrace}");
+            Console.WriteLine($"========================================");
+            errorMessage = "Erro ao carregar produtos: " + ex.Message;
+            loading = false;
+        }
+    }
+}
 
 <section class="hero">
     <div class="hero-card">
@@ -50,113 +101,78 @@
 </div>
 
 <section class="products">
-    @foreach (var product in products)
+    
+    @if (loading)
     {
-        <article class="card">
-            <div class="card-image">
-                @if (!string.IsNullOrEmpty(product.Tag))
-                {
-                    <span class="tag @product.TagClass">@product.Tag</span>
-                }
-                <i class="bi bi-@product.Icon"></i>
-                <div class="fav">
-                    <i class="bi bi-heart"></i>
-                </div>
+        <div class="loading">
+            <p>Carregando produtos...</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="error">
+            <p>@errorMessage</p>
+        </div>
+    }
+    else
+    {
+        @if (items.Count == 0)
+        {
+            <div class="no-items">
+                <p style="background: orange; padding: 20px; color: white;">
+                    Nenhum item encontrado! A lista está vazia.
+                </p>
             </div>
-            <div class="card-body">
-                <h3>@product.Name</h3>
-                <p>@product.Description</p>
-                <div class="card-footer">
-                    <span class="price">@product.Price</span>
-                    <button class="add-btn">
-                        <i class="bi bi-cart-plus"></i> Add
-                    </button>
+        }
+        
+        @foreach (var item in items)
+        {
+            <article class="card">
+                <div class="card-image">
+                    @if (!string.IsNullOrEmpty(item.UrlImagem))
+                    {
+                        <img src="@item.UrlImagem" alt="@item.Nome" />
+                    }
+                    else
+                    {
+                        <i class="bi bi-@GetIconForType(item.Tipo)"></i>
+                    }
+                    <div class="fav">
+                        <i class="bi bi-heart"></i>
+                    </div>
                 </div>
-            </div>
-        </article>
+                <div class="card-body">
+                    <h3>@item.Nome</h3>
+                    <p>@item.Descricao</p>
+                    <div class="card-footer">
+                        <span class="price">@FormatPrice(item.Preco)</span>
+                        <button class="add-btn">
+                            <i class="bi bi-cart-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </article>
+        }
     }
 </section>
 
-<a class="floating-btn" href="#menu">🍴</a>
-
 @code {
-    private List<Product> products = new()
+    private string GetIconForType(string tipo)
     {
-        new()
+        return tipo.ToLower() switch
         {
-            Name = "The OG Classic",
-            Description = "Prime beef patty, melted cheddar, pickles, onion, and our signature burger sauce.",
-            Price = "$12.90",
-            Icon = "burger",
-            Tag = "Bestseller",
-            TagClass = ""
-        },
-        new()
-        {
-            Name = "Spicy Buffalo",
-            Description = "Buttermilk fried chicken, house buffalo sauce, ranch slaw, and jalapeños.",
-            Price = "$11.50",
-            Icon = "dish-fill",
-            TagClass = "orange"
-        },
-        new()
-        {
-            Name = "Truffle Fries",
-            Description = "Hand-cut fries tossed in white truffle oil, rosemary, and parmesan dust.",
-            Price = "$6.50",
-            Icon = "cup-straw",
-            Tag = "New",
-            TagClass = "brown"
-        },
-        new()
-        {
-            Name = "Colossal Rings",
-            Description = "Giant sweet onions, double-dipped in our beer batter and fried to perfection.",
-            Price = "$5.90",
-            Icon = "circle-half"
-        },
-        new()
-        {
-            Name = "Choco-Fudge Shake",
-            Description = "Velvety dark chocolate ice cream blended with homemade fudge chunks.",
-            Price = "$7.20",
-            Icon = "cup-hot-fill",
-            TagClass = "black"
-        },
-        new()
-        {
-            Name = "The Green Garden",
-            Description = "Roasted beet and quinoa patty, smashed avocado, and herb vegan mayo.",
-            Price = "$13.50",
-            Icon = "emoji-smile",
-            Tag = "Vegan",
-            TagClass = "green"
-        },
-        new()
-        {
-            Name = "Citrus Mist",
-            Description = "Sparkling lemon-lime infusion with a hint of fresh garden mint.",
-            Price = "$4.50",
-            Icon = "emoji-laughing",
-            TagClass = "teal"
-        },
-        new()
-        {
-            Name = "Zesty Slaw",
-            Description = "Red and green cabbage with our secret apple cider vinegar dressing.",
-            Price = "$3.50",
-            Icon = "emoji-dizzy",
-            TagClass = "black"
-        }
-    };
+            "burger" => "burger",
+            "side" => "dish-fill",
+            "drink" => "cup-hot-fill",
+            "dessert" => "ice-cream",
+            _ => "emoji-smile"
+        };
+    }
 
-    public class Product
+    private string FormatPrice(decimal preco)
     {
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string Price { get; set; } = string.Empty;
-        public string Icon { get; set; } = string.Empty;
-        public string? Tag { get; set; }
-        public string TagClass { get; set; } = string.Empty;
+        return preco.ToString("C2").Replace("R$", "R$");
     }
 }
+
+<a class="floating-btn" href="#menu">🍴</a>

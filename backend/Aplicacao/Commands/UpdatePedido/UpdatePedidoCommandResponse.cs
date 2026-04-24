@@ -1,6 +1,6 @@
 using Ardalis.Result;
 
-namespace Clientes.Aplicacao.Commands.UpdatePedido
+namespace Aplicacao.Commands.UpdatePedido
 {
     /// <summary>
     /// Response para o command UpdatePedido

@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Clientes.Aplicacao.Commands.UpdatePedido
+namespace Aplicacao.Commands.UpdatePedido
 {
     /// <summary>
     /// Validator para o command UpdatePedido

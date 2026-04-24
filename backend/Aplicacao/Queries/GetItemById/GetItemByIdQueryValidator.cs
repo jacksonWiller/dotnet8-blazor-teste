@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Clientes.Aplicacao.Queries.GetItemById;
+namespace Aplicacao.Queries.GetItemById;
 
 /// <summary>
 /// Validator para a query GetItemById

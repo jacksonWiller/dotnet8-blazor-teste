@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using FluentValidation;
-using Clientes.Dominio.Eventos;
+using Dominio.Eventos;
 
-namespace Clientes.Dominio.Entidades
+namespace Dominio.Entidades
 {
     public class EntidadeBase
     {

@@ -1,4 +1,4 @@
-﻿namespace Clientes.Dominio.ObjetosDeValor
+﻿namespace Dominio.ObjetosDeValor
 {
     public class Telefone
     {

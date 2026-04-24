@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using Clientes.Aplicacao.Queries.GetAllPedidos;
 using Clientes.Dominio.Dtos;
 using Clientes.Dominio.Interfaces;
 using MediatR;

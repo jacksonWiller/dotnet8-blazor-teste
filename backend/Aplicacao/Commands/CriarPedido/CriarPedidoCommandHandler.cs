@@ -1,6 +1,7 @@
 using Aplicacao.Commands.CriarPedido;
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
+using Dominio.Entidades;
 using FluentValidation;
 using MediatR;
 
@@ -37,7 +38,7 @@ namespace Aplicacao.Commands.CriarPedido
             // Adicionar itens ao pedido
             foreach (var itemId in request.ItensIds)
             {
-                var itemCardapio = ItemCardapio.GetAllItens().FirstOrDefault(i => i.Id == itemId);
+                var itemCardapio = Item.GetAllItens().FirstOrDefault(i => i.Id == itemId);
                 
                 if (itemCardapio == null)
                 {

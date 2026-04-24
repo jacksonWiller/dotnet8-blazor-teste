@@ -1,6 +1,6 @@
 using Dominio.Dtos;
 
-namespace Clientes.Aplicacao.Queries.GetAllPedidos
+namespace Aplicacao.Queries.GetAllPedidos
 {
     /// <summary>
     /// Response para a query GetAllPedidos

@@ -1,6 +1,6 @@
-using Clientes.Dominio.Eventos;
+using Dominio.Eventos;
 
-namespace Clientes.Dominio.Entidades
+namespace Dominio.Entidades
 {
     /// <summary>
     /// Representa um pedido da Good Hamburger
@@ -19,9 +19,9 @@ namespace Clientes.Dominio.Entidades
         /// <summary>
         /// Cria um novo pedido
         /// </summary>
-        private Pedido()
+        private Pedido(Guid id)
         {
-            Id = Guid.NewGuid();
+            Id = id;
             Itens = new List<PedidoItem>();
             Subtotal = 0;
             Desconto = 0;

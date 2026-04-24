@@ -4,7 +4,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Catalog.Application;
+namespace Aplicacao;
 
 [ExcludeFromCodeCoverage]
 public static class ConfigureServices

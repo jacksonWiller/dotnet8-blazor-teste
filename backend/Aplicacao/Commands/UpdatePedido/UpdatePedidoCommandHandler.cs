@@ -1,6 +1,5 @@
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
-using Clientes.Aplicacao.Commands.UpdatePedido;
 using Clientes.Dominio.Dtos;
 using Clientes.Dominio.Entidades;
 using Clientes.Dominio.Interfaces;

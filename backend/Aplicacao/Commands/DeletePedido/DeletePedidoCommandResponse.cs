@@ -1,6 +1,6 @@
 using Ardalis.Result;
 
-namespace Clientes.Aplicacao.Commands.DeletePedido
+namespace Aplicacao.Commands.DeletePedido
 {
     /// <summary>
     /// Response para o command DeletePedido

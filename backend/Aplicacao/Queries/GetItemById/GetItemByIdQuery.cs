@@ -1,7 +1,7 @@
 using Ardalis.Result;
 using MediatR;
 
-namespace Clientes.Aplicacao.Queries.GetItemById;
+namespace Aplicacao.Queries.GetItemById;
 
 /// <summary>
 /// Query para obter um item pelo ID

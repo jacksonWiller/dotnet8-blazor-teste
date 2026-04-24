@@ -1,6 +1,6 @@
 using Ardalis.Result;
 
-namespace Clientes.Aplicacao.Queries.GetItemById;
+namespace Aplicacao.Queries.GetItemById;
 
 /// <summary>
 /// Resposta da query GetItemById

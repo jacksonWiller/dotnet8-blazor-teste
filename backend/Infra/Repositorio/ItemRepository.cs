@@ -1,12 +1,12 @@
-using Clientes.Dominio.Dtos;
-using Clientes.Dominio.Entidades;
-using Clientes.Dominio.Interfaces;
-using Clientes.Infra.Contexto;
+using Dominio.Dtos;
+using Dominio.Entidades;
+using Dominio.Interfaces;
+using Infra.Contexto;
 using Fop;
 using Fop.FopExpression;
 using Microsoft.EntityFrameworkCore;
 
-namespace Clientes.Infra.Repositorios
+namespace Infra.Repositorio
 {
     /// <summary>
     /// Implementação do repositório para itens do menu

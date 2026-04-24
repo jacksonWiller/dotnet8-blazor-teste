@@ -1,4 +1,4 @@
-﻿namespace Clientes.Dominio.Eventos
+﻿namespace Dominio.Eventos
 {
     public abstract class EventoBase
     {

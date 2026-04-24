@@ -2,7 +2,7 @@ using Ardalis.Result;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
 
-namespace Clientes.Aplicacao.Commands.DeletePedido
+namespace Aplicacao.Commands.DeletePedido
 {
     /// <summary>
     /// Command para remover um pedido

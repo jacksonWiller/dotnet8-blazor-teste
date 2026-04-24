@@ -1,6 +1,6 @@
-﻿using Clientes.Dominio.Entidades;
+﻿using Dominio.Entidades;
 
-namespace Clientes.Dominio.Eventos
+namespace Dominio.Eventos
 {
     public class AdicionandoClienteEvent(Cliente cliente) : EventoBase
     {

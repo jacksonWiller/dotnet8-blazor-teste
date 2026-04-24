@@ -2,7 +2,7 @@ using Ardalis.Result;
 using Clientes.Dominio.Dtos;
 using MediatR;
 
-namespace Clientes.Aplicacao.Queries.GetAllPedidos
+namespace Aplicacao.Queries.GetAllPedidos
 {
     /// <summary>
     /// Query para listar todos os pedidos

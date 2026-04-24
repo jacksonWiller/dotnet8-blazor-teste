@@ -1,4 +1,4 @@
-namespace Clientes.Dominio.Eventos
+namespace Dominio.Eventos
 {
     /// <summary>
     /// Evento disparado quando um item é adicionado a um pedido

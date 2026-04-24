@@ -3,7 +3,7 @@ using Clientes.Dominio.Dtos;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
 
-namespace Clientes.Aplicacao.Queries.GetPedidoById
+namespace Aplicacao.Queries.GetPedidoById
 {
     /// <summary>
     /// Query para buscar um pedido pelo ID

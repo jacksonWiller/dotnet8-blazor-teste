@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Clientes.Dominio.Interfaces
+namespace Dominio.Interfaces
 {
-    public interface IClienteContext
+    public interface IGoodHamburgerContext
     {
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
     }

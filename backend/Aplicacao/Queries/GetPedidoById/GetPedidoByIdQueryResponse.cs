@@ -1,6 +1,6 @@
 using Dominio.Dtos;
 
-namespace Clientes.Aplicacao.Queries.GetPedidoById
+namespace Aplicacao.Queries.GetPedidoById
 {
     /// <summary>
     /// Response para a query GetPedidoById

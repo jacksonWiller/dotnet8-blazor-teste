@@ -1,3 +1,4 @@
+using Aplicacao.Queries.GetAllItems;
 using Ardalis.Result;
 using MediatR;
 

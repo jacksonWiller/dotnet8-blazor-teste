@@ -4,7 +4,7 @@ using Clientes.Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
 
-namespace Clientes.Aplicacao.Queries.GetItemById;
+namespace Aplicacao.Queries.GetItemById;
 
 /// <summary>
 /// Handler para a query GetItemById

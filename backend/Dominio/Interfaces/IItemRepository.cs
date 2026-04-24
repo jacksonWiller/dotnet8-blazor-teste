@@ -1,7 +1,7 @@
-using Clientes.Dominio.Dtos;
-using Clientes.Dominio.Entidades;
+using Dominio.Dtos;
+using Dominio.Entidades;
 
-namespace Clientes.Dominio.Interfaces
+namespace Dominio.Interfaces
 {
     /// <summary>
     /// Repositório para operações com itens do menu

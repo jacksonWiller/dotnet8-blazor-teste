@@ -2,7 +2,7 @@ using Ardalis.Result;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
 
-namespace Clientes.Aplicacao.Commands.UpdatePedido
+namespace Aplicacao.Commands.UpdatePedido
 {
     /// <summary>
     /// Command para atualizar um pedido

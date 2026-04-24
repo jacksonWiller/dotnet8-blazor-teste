@@ -1,34 +1,24 @@
-namespace Clientes.Dominio.Entidades
+namespace Dominio.Entidades
 {
     /// <summary>
     /// Tipos de itens do menu da GoodHamburger
     /// </summary>
-    public enum TipoItem
+    public enum CategoriaItem
     {
         /// <summary>
-        /// Hambúrguer
+        /// Sanduíches
         /// </summary>
-        Burger = 1,
-        
+        Sanduiche = 1,
+
         /// <summary>
-        /// Acompanhamento
+        /// Acompanhamentos
         /// </summary>
         Acompanhamento = 2,
-        
+
         /// <summary>
-        /// Bebida
+        /// Bebidas
         /// </summary>
-        Bebida = 3,
-        
-        /// <summary>
-        /// Sobremesa
-        /// </summary>
-        Sobremesa = 4,
-        
-        /// <summary>
-        /// Combo
-        /// </summary>
-        Combo = 5
+        Bebida = 3
     }
 
     /// <summary>

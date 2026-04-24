@@ -4,7 +4,7 @@ using Clientes.Dominio.Entidades;
 using Clientes.Dominio.Interfaces;
 using MediatR;
 
-namespace Clientes.Aplicacao.Queries.GetPedidoById
+namespace Aplicacao.Queries.GetPedidoById
 {
     /// <summary>
     /// Handler para a query GetPedidoById

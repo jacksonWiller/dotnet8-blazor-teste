@@ -1,6 +1,6 @@
 using Ardalis.Result;
 
-namespace Clientes.Aplicacao.Queries.GetAllItems;
+namespace Aplicacao.Queries.GetAllItems;
 
 /// <summary>
 /// Resposta da query GetAllItems

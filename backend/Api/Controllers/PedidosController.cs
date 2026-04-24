@@ -125,5 +125,28 @@ namespace Api.Controllers
             var result = await _mediator.Send(command);
             return result.ToActionResult();
         }
+
+        ////////////////////////////
+        // DELETE: /api/pedidos/{id}
+        ////////////////////////////
+
+        /// <summary>
+        /// Deleta um pedido pelo ID
+        /// </summary>
+        /// <param name="id">ID do pedido</param>
+        /// <response code="200">Pedido deletado com sucesso.</response>
+        /// <response code="404">Quando o pedido não é encontrado.</response>
+        /// <response code="500">Quando ocorre um erro interno inesperado no servidor.</response>
+        [HttpDelete("{id:guid}")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<DeletePedidoCommandResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var command = new DeletePedidoCommand { Id = id };
+            var result = await _mediator.Send(command);
+            return result.ToActionResult();
+        }
     }
 }

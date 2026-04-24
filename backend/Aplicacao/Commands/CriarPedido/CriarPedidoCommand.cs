@@ -1,7 +1,8 @@
+using Aplicacao.Commands.CriarPedido;
 using Ardalis.Result;
 using MediatR;
 
-namespace Clientes.Aplicacao.Commands.CriarPedido
+namespace Aplicacao.Commands.CriarPedido
 {
     /// <summary>
     /// Command para criar um novo pedido

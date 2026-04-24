@@ -1,4 +1,4 @@
-namespace Clientes.Dominio.Dtos
+namespace Dominio.Dtos
 {
     /// <summary>
     /// DTO para representar um item do cardápio

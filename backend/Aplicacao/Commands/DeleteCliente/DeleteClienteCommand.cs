@@ -1,7 +1,7 @@
 ﻿using Ardalis.Result;
 using MediatR;
 
-namespace Clientes.Aplicacao.Commands.DeleteCliente;
+namespace Aplicacao.Commands.DeleteCliente;
 
 public class DeleteClienteCommand : IRequest<Result<DeleteClienteResponse>>
 {

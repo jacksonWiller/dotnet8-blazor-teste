@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Clientes.Aplicacao.Commands.CreateCliente
+namespace Aplicacao.Commands.CreateCliente
 {
     public class CreateClienteResponse(Guid id)
     {

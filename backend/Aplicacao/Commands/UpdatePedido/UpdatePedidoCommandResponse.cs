@@ -11,6 +11,6 @@ namespace Clientes.Aplicacao.Commands.UpdatePedido
         public decimal Subtotal { get; set; }
         public decimal Desconto { get; set; }
         public decimal Total { get; set; }
-        public List<Dominio.Dtos.PedidoItemDto> Itens { get; set; }
+        public List<PedidoItemDto> Itens { get; set; }
     }
 }

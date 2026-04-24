@@ -3,7 +3,7 @@ using Ardalis.Result.FluentValidation;
 using FluentValidation;
 using MediatR;
 
-namespace Clientes.Aplicacao.Commands.CriarPedido
+namespace Aplicacao.Commands.CriarPedido
 {
     /// <summary>
     /// Validator para o command CriarPedido

@@ -1,10 +1,11 @@
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
+using Clientes.Aplicacao.Commands.DeletePedido;
 using Clientes.Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
 
-namespace Clientes.Aplicacao.Commands.DeletePedido
+namespace Aplicacao.Commands.DeletePedido
 {
     /// <summary>
     /// Handler para o command DeletePedido

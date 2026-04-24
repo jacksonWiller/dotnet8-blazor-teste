@@ -2,7 +2,7 @@
 using Clientes.Dominio.ObjetosDeValor;
 using MediatR;
 
-namespace Clientes.Aplicacao.Commands.CreateCliente
+namespace Aplicacao.Commands.CreateCliente
 {
     public class CreateClienteCommand : IRequest<Result<CreateClienteResponse>>
     {

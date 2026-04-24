@@ -3,7 +3,7 @@ using Clientes.Dominio.Dtos;
 using Clientes.Dominio.Interfaces;
 using MediatR;
 
-namespace Clientes.Aplicacao.Queries.GetAllPedidos
+namespace Aplicacao.Queries.GetAllPedidos
 {
     /// <summary>
     /// Handler para a query GetAllPedidos

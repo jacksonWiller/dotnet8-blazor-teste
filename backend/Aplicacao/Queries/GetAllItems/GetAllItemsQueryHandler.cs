@@ -1,10 +1,11 @@
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
+using Clientes.Aplicacao.Queries.GetAllItems;
 using Clientes.Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
 
-namespace Clientes.Aplicacao.Queries.GetAllItems;
+namespace Aplicacao.Queries.GetAllItems;
 
 /// <summary>
 /// Handler para a query GetAllItems

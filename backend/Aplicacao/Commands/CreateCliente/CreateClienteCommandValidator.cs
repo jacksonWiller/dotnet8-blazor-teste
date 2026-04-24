@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Clientes.Aplicacao.Commands.CreateCliente
+namespace Aplicacao.Commands.CreateCliente
 {
     public class CreateClienteCommandValidator : AbstractValidator<CreateClienteCommand>
     {

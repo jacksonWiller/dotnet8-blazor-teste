@@ -1,10 +1,10 @@
+using Aplicacao.Commands.CriarPedido;
 using Ardalis.Result;
 using Ardalis.Result.FluentValidation;
-using Clientes.Aplicacao.Commands.CriarPedido;
 using FluentValidation;
 using MediatR;
 
-namespace Clientes.Aplicacao.Commands.CriarPedido
+namespace Aplicacao.Commands.CriarPedido
 {
     /// <summary>
     /// Handler para o command CriarPedido

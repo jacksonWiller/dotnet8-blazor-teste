@@ -4,7 +4,7 @@ using Clientes.Dominio.Interfaces;
 using FluentValidation;
 using MediatR;
 
-namespace Clientes.Aplicacao.Commands.DeleteCliente;
+namespace Aplicacao.Commands.DeleteCliente;
 
 public class DeleteClienteCommandHandler : IRequestHandler<DeleteClienteCommand, Result<DeleteClienteResponse>>
 {

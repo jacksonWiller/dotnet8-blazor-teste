@@ -1,6 +1,7 @@
 using Ardalis.Result;
+using Dominio.Dtos;
 
-namespace Clientes.Aplicacao.Commands.CriarPedido
+namespace Aplicacao.Commands.CriarPedido
 {
     /// <summary>
     /// Response para o command CriarPedido
@@ -11,6 +12,6 @@ namespace Clientes.Aplicacao.Commands.CriarPedido
         public decimal Subtotal { get; set; }
         public decimal Desconto { get; set; }
         public decimal Total { get; set; }
-        public List<Dominio.Dtos.PedidoItemDto> Itens { get; set; }
+        public List<PedidoItemDto> Itens { get; set; }
     }
 }

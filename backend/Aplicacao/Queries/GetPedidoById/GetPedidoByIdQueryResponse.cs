@@ -1,4 +1,4 @@
-using Clientes.Dominio.Dtos;
+using Dominio.Dtos;
 
 namespace Clientes.Aplicacao.Queries.GetPedidoById
 {

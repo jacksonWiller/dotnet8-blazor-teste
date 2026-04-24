@@ -49,19 +49,19 @@ namespace Clientes.Dominio.Entidades
         /// <summary>
         /// Cria um sanduíche X Burger
         /// </summary>
-        public static ItemCardapio CreateX Burger() => 
+        public static ItemCardapio CreateXBurger() => 
             new(Guid.Parse("a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1"), "X Burger", CategoriaItem.Sanduiche, 5.00m);
 
         /// <summary>
         /// Cria um sanduíche X Egg
         /// </summary>
-        public static ItemCardapio CreateX Egg() => 
+        public static ItemCardapio CreateXEgg() => 
             new(Guid.Parse("a2a2a2a2-a2a2-a2a2-a2a2-a2a2a2a2a2a2"), "X Egg", CategoriaItem.Sanduiche, 4.50m);
 
         /// <summary>
         /// Cria um sanduíche X Bacon
         /// </summary>
-        public static ItemCardapio CreateX Bacon() => 
+        public static ItemCardapio CreateXBacon() => 
             new(Guid.Parse("a3a3a3a3-a3a3-a3a3-a3a3-a3a3a3a3a3a3"), "X Bacon", CategoriaItem.Sanduiche, 7.00m);
 
         /// <summary>
@@ -81,9 +81,9 @@ namespace Clientes.Dominio.Entidades
         /// </summary>
         public static IEnumerable<ItemCardapio> GetAllItens()
         {
-            yield return CreateX Burger();
-            yield return CreateX Egg();
-            yield return CreateX Bacon();
+            yield return CreateXBurger();
+            yield return CreateXEgg();
+            yield return CreateXBacon();
             yield return CreateBatataFrita();
             yield return CreateRefrigerante();
         }

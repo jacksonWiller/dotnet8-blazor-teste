@@ -7,7 +7,7 @@ namespace Infra.Contexto;
 
 public class GoodHamburgerContext(DbContextOptions<GoodHamburgerContext> dbOptions) : BaseDbContext<GoodHamburgerContext>(dbOptions), IGoodHamburgerContext
 {
-    public DbSet<Item> Itens { get; set; }
+    public DbSet<Item> Items { get; set; }
     public DbSet<Pedido> Pedidos { get; set; }
     public DbSet<PedidoItem> PedidoItens { get; set; }
 
@@ -15,6 +15,49 @@ public class GoodHamburgerContext(DbContextOptions<GoodHamburgerContext> dbOptio
     {
         base.OnModelCreating(modelBuilder);
         
+        // Configurar entidade Item
+        modelBuilder.Entity<Item>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Id)
+                .HasColumnType("uuid")
+                .HasDefaultValueSql("gen_random_uuid()");
+            
+            entity.Property(e => e.Nome)
+                .HasColumnType("text")
+                .IsRequired();
+            
+            entity.Property(e => e.Descricao)
+                .HasColumnType("text")
+                .IsRequired();
+            
+            entity.Property(e => e.Preco)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+            
+            entity.Property(e => e.Tipo)
+                .HasColumnType("text")
+                .IsRequired();
+            
+            entity.Property(e => e.Categoria)
+                .HasColumnType("text")
+                .IsRequired();
+            
+            entity.Property(e => e.UrlImagem)
+                .HasColumnType("text");
+            
+            entity.Property(e => e.Removido)
+                .IsRequired()
+                .HasDefaultValue(false);
+            
+            entity.HasIndex(e => e.Tipo);
+            entity.HasIndex(e => e.Categoria);
+            
+            entity.ToTable("Item");
+        });
+        
+        // Configurar entidade PedidoItem
         modelBuilder.Entity<PedidoItem>(entity =>
         {
             entity.HasKey(e => e.Id);

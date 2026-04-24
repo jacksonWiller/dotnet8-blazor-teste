@@ -23,7 +23,7 @@ namespace Infra.Repositorio
 
         public async Task<List<Item>> GetByExpressionAsync(Expression<Func<Item, bool>> predicate)
         {
-            return await _dataContext.Itens
+            return await _dataContext.Items
                 .Where(predicate)   
                 .AsNoTracking()
                 .ToListAsync();
@@ -40,8 +40,8 @@ namespace Infra.Repositorio
         {
             var fopRequest = FopExpressionBuilder<Item>.Build(filter, order, pageNumber, pageSize);
 
-            var query = _dataContext.Itens
-                .Where(x => x.Ativo)
+            var query = _dataContext.Items
+                .Where(x => x.Removido)
                 .AsNoTracking();
 
             var (filteredItens, totalRecords) = query
@@ -58,7 +58,7 @@ namespace Infra.Repositorio
                 Tipo = i.Tipo,
                 Categoria = i.Categoria,
                 UrlImagem = i.UrlImagem,
-                Ativo = i.Ativo
+                Ativo = i.Removido
             }).ToList();
 
             return (itensListaDto, totalRecords);
@@ -69,8 +69,8 @@ namespace Infra.Repositorio
         /// </summary>
         public async Task<Item> GetItemByIdAsync(Guid itemId)
         {
-            var query = _dataContext.Itens
-                .Where(c => c.Id == itemId && c.Ativo)
+            var query = _dataContext.Items
+                .Where(c => c.Id == itemId && c.Removido == false)
                 .AsNoTracking();
 
             return await query.FirstOrDefaultAsync();
@@ -81,7 +81,7 @@ namespace Infra.Repositorio
         /// </summary>
         public async Task AdicionarAsync(Item item)
         {
-            _dataContext.Itens.Add(item);
+            _dataContext.Items.Add(item);
             await _dataContext.SaveChangesAsync();
         }
 
@@ -90,7 +90,7 @@ namespace Infra.Repositorio
         /// </summary>
         public async Task AtualizarAsync(Item item)
         {
-            _dataContext.Itens.Update(item);
+            _dataContext.Items.Update(item);
             await _dataContext.SaveChangesAsync();
         }
 
@@ -99,12 +99,12 @@ namespace Infra.Repositorio
         /// </summary>
         public async Task RemoverAsync(Guid itemId)
         {
-            var item = await _dataContext.Itens
+            var item = await _dataContext.Items
                 .FirstOrDefaultAsync(x => x.Id == itemId);
 
             if (item != null)
             {
-                item.Desativar();
+                item.Remover();
                 await _dataContext.SaveChangesAsync();
             }
         }
@@ -114,8 +114,8 @@ namespace Infra.Repositorio
         /// </summary>
         public async Task<bool> ExisteItemComNomeAsync(string nome, Guid itemId = default)
         {
-            return await _dataContext.Itens
-                .AnyAsync(i => i.Nome == nome && i.Id != itemId && i.Ativo);
+            return await _dataContext.Items
+                .AnyAsync(i => i.Nome == nome && i.Id != itemId && i.Removido);
         }
 
         /// <summary>
@@ -128,8 +128,8 @@ namespace Infra.Repositorio
                 return new List<Item>();
             }
 
-            return await _dataContext.Itens
-                .Where(i => itemIds.Contains(i.Id) && i.Ativo)
+            return await _dataContext.Items
+                .Where(i => itemIds.Contains(i.Id) && i.Removido)
                 .AsNoTracking()
                 .ToListAsync();
         }

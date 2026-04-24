@@ -53,7 +53,7 @@ public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, Result<
                 Tipo = item.Tipo,
                 Categoria = item.Categoria,
                 UrlImagem = item.UrlImagem,
-                Ativo = item.Ativo
+                Ativo = item.Removido
             }
         };
 

@@ -64,7 +64,7 @@ namespace Dominio.Entidades
         /// <summary>
         /// Indica se o item está ativo no menu
         /// </summary>
-        public bool Ativo { get; private set; } = true;
+        public bool Removido { get; private set; } = false;
 
         /// <summary>
         /// Construtor protegido para EF Core
@@ -89,7 +89,7 @@ namespace Dominio.Entidades
             Tipo = tipo ?? throw new ArgumentNullException(nameof(tipo));
             Categoria = categoria ?? throw new ArgumentNullException(nameof(categoria));
             UrlImagem = urlImagem;
-            Ativo = true;
+            Removido = true;
 
             Validar();
         }
@@ -131,6 +131,14 @@ namespace Dominio.Entidades
         }
 
         /// <summary>
+        /// Verifica se o tipo é válido
+        /// </summary>
+        public void Remover()
+        {
+            Removido = true;
+        }
+
+        /// <summary>
         /// Atualiza as informações do item
         /// </summary>
         /// <param name="nome">Novo nome do produto</param>
@@ -151,14 +159,5 @@ namespace Dominio.Entidades
             Validar();
         }
 
-        /// <summary>
-        /// Desativa o item do menu
-        /// </summary>
-        public void Desativar() => Ativo = false;
-        
-        /// <summary>
-        /// Ativa o item no menu
-        /// </summary>
-        public void Ativar() => Ativo = true;
     }
 }

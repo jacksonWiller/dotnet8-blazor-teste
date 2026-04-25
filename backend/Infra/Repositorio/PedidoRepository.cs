@@ -62,6 +62,7 @@ namespace Infra.Repositorio
                 Subtotal = p.Subtotal,
                 Desconto = p.Desconto,
                 Total = p.Total,
+                Status = p.Status,
                 DataCriacao = p.DataCriacao
             }).ToList();
 

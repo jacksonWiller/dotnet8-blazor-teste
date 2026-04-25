@@ -37,7 +37,10 @@ builder.Services.AddValidatorsFromAssembly(typeof(UpdatePedidoCommand).Assembly)
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
 
 builder.Services.AddCors(options =>
 {

@@ -41,6 +41,30 @@ public class PedidoResponse
     public PedidoDetalhes? Pedido { get; set; }
 }
 
+public class CreatePedidoResponse
+{
+    [JsonPropertyName("pedidoId")]
+    public Guid PedidoId { get; set; }
+    
+    [JsonPropertyName("subtotal")]
+    public decimal Subtotal { get; set; }
+    
+    [JsonPropertyName("desconto")]
+    public decimal Desconto { get; set; }
+    
+    [JsonPropertyName("total")]
+    public decimal Total { get; set; }
+    
+    [JsonPropertyName("itens")]
+    public List<PedidoItemDto> Itens { get; set; } = new();
+}
+
+public class PedidoResponseWrapper
+{
+    [JsonPropertyName("pedido")]
+    public CreatePedidoResponse? Pedido { get; set; }
+}
+
 public class PedidoDetalhes
 {
     [JsonPropertyName("id")]
@@ -59,7 +83,7 @@ public class PedidoDetalhes
     public decimal Total { get; set; }
     
     [JsonPropertyName("status")]
-    public string Status { get; set; } = "Pendente";
+    public int Status { get; set; } = 0;
     
     [JsonPropertyName("dataCriacao")]
     public DateTime DataCriacao { get; set; }

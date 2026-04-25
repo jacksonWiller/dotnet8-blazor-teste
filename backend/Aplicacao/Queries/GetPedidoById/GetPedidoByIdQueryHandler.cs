@@ -46,6 +46,7 @@ namespace Aplicacao.Queries.GetPedidoById
                 Subtotal = pedido.Subtotal,
                 Desconto = pedido.Desconto,
                 Total = pedido.Total,
+                Status = pedido.Status,
                 DataCriacao = pedido.DataCriacao
             };
 

@@ -4,6 +4,7 @@
 @inject NavigationManager Navigation
 @inject IItemService ItemService
 @inject ICartService CartService
+@inject IOrderService OrderService
 @rendermode InteractiveServer
 
 @code {
@@ -121,15 +122,6 @@
     }
 </section>
 
-@if (showNotification)
-{
-    <div class="notification">
-        <i class="bi bi-check-circle-fill"></i>
-        <span>@notificationMessage</span>
-        <button @onclick="HideNotification" class="close-btn">&times;</button>
-    </div>
-}
-
 @if (CartService.ItemCount > 0)
 {
     <button class="add-btn floating-btn-2" @onclick="NavigateToCheckout">
@@ -159,15 +151,28 @@
         }
     }
 
-    private void HideNotification()
+    private async Task NavigateToCheckout()
     {
-        showNotification = false;
-    }
+        if (CartService.Items.Count == 0)
+        {
+            notificationMessage = "Seu carrinho está vazio!";
+            showNotification = true;
+            return;
+        }
 
-    private void NavigateToCheckout()
-    {
-        Console.WriteLine($"Navigating to checkout with {CartService.ItemCount} items");
-        Navigation.NavigateTo("/checkout", forceLoad: true);
+        try
+        {
+            // Cria o pedido com status inicial (Pendente)
+            var itemIds = CartService.Items.Select(i => i.ItemId).ToList();
+            var orderResponse = await OrderService.CreateOrderAsync(itemIds);
+            await CartService.SetOrderIdAsync(orderResponse.PedidoId);
+            Navigation.NavigateTo("/cart");
+        }
+        catch (Exception ex)
+        {
+            notificationMessage = $"Erro ao criar pedido: {ex.Message}";
+            showNotification = true;
+        }
     }
 
     private string GetIconForType(string tipo)

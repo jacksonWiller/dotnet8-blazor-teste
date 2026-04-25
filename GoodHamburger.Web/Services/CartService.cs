@@ -31,6 +31,8 @@ public interface ICartService
     Task InitializeCartAsync();
     Task CreateOrderAsync(IOrderService orderService);
     Task CancelOrderAsync(IOrderService orderService);
+    Task SetOrderIdAsync(Guid orderId);
+    Task ClearOrderIdAsync();
 }
 
 public class CartService : ICartService
@@ -192,7 +194,7 @@ public class CartService : ICartService
         var itemIds = _cartItems.Select(i => i.ItemId).ToList();
         var orderResponse = await orderService.CreateOrderAsync(itemIds);
         
-        _orderId = orderResponse.Pedido.Id;
+        _orderId = orderResponse.PedidoId;
         
         // Salvar Order ID no localStorage
         await _jsRuntime.InvokeAsync<object>(
@@ -205,6 +207,26 @@ public class CartService : ICartService
         OnOrderCreated?.Invoke();
     }
     
+    /// <summary>
+    /// Define o ID do pedido atual
+    /// </summary>
+    public async Task SetOrderIdAsync(Guid orderId)
+    {
+        _orderId = orderId;
+        await _jsRuntime.InvokeAsync<object>("localStorage.setItem", OrderIdKey, orderId.ToString());
+        OnChange?.Invoke();
+    }
+
+    /// <summary>
+    /// Limpa o ID do pedido atual
+    /// </summary>
+    public async Task ClearOrderIdAsync()
+    {
+        _orderId = null;
+        await _jsRuntime.InvokeAsync<object>("localStorage.removeItem", OrderIdKey);
+        OnChange?.Invoke();
+    }
+
     /// <summary>
     /// Cancela o pedido atual
     /// </summary>

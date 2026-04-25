@@ -8,7 +8,7 @@ namespace GoodHamburger.Web.Services;
 /// </summary>
 public interface IOrderService
 {
-    Task<PedidoResponse> CreateOrderAsync(List<Guid> itemIds);
+    Task<CreatePedidoResponse> CreateOrderAsync(List<Guid> itemIds);
     Task<PedidoDetalhes?> GetOrderByIdAsync(Guid orderId);
     Task<PagedPedidoResponse> GetAllOrdersAsync(int pageNumber = 1, int pageSize = 10);
     Task<PedidoDetalhes?> UpdateOrderAsync(Guid orderId, List<UpdateOrderItemDto> itens, string novoStatus);
@@ -27,7 +27,7 @@ public class OrderService : IOrderService
     /// <summary>
     /// Cria um novo pedido com os itens selecionados
     /// </summary>
-    public async Task<PedidoResponse> CreateOrderAsync(List<Guid> itemIds)
+    public async Task<CreatePedidoResponse> CreateOrderAsync(List<Guid> itemIds)
     {
         if (itemIds == null || !itemIds.Any())
             throw new ArgumentException("É necessário pelo menos um item para criar um pedido.", nameof(itemIds));
@@ -46,7 +46,7 @@ public class OrderService : IOrderService
                 $"Erro ao criar pedido: {response.StatusCode} - {errorContent}");
         }
         
-        var result = await response.Content.ReadFromJsonAsync<ApiResponse<PedidoResponse>>();
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CreatePedidoResponse>>();
         
         if (result?.Success != true)
         {

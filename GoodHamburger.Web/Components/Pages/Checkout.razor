@@ -1,4 +1,5 @@
 @page "/checkout"
+@page "/checkout/{OrderId:guid}"
 @using GoodHamburger.Web.Components.Models
 @using GoodHamburger.Web.Services
 @inject NavigationManager Navigation
@@ -31,8 +32,8 @@
             <h2>Pedido Criado com Sucesso!</h2>
             <p>Obrigado pela sua compra!</p>
             <div class="order-details">
-                <p><strong>ID do Pedido:</strong> @orderResponse?.Pedido?.Id.ToString().ToUpper()</p>
-                <p><strong>Total:</strong> @orderResponse?.Pedido?.Total.ToString("C2")</p>
+                <p><strong>ID do Pedido:</strong> @orderResponse?.PedidoId.ToString().ToUpper()</p>
+                <p><strong>Total:</strong> @orderResponse?.Total.ToString("C2")</p>
             </div>
             <button @onclick="NavigateToHome" class="btn btn-primary">
                 <i class="bi bi-burger"></i> Fazer Novo Pedido
@@ -41,14 +42,74 @@
     }   
     else if (CartService.Items.Any() == false)
     {
-        <div class="empty-cart">
-            <i class="bi bi-cart-x"></i>
-            <h2>Seu carrinho está vazio</h2>
-            <p>Adicione itens antes de finalizar o pedido.</p>
-            <button @onclick="NavigateToCart" class="btn btn-primary">
-                <i class="bi bi-cart"></i> Ir para o Carrinho
-            </button>
-        </div>
+        // Se houver OrderId, mostrar detalhes do pedido
+        if (OrderId != Guid.Empty && orderDetails != null)
+        {
+            <div class="order-details-page">
+                <h1 class="mb-4">Detalhes do Pedido</h1>
+                
+                <div class="order-info-card">
+                    <div class="order-header">
+                        <h3><i class="bi bi-receipt"></i> Informações do Pedido</h3>
+                        <span class="order-id">ID: @orderDetails.Id.ToString().ToUpper()</span>
+                    </div>
+                    
+                    <div class="order-status">
+                        <span class="status-badge">Status: @orderDetails.Status</span>
+                    </div>
+                    
+                    <div class="order-meta">
+                        <p><i class="bi bi-calendar3"></i> Data de Criação: @orderDetails.DataCriacao.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                </div>
+                
+                <div class="order-items-list">
+                    <h4 class="mb-3">Itens do Pedido</h4>
+                    @foreach (var item in orderDetails.Itens)
+                    {
+                        <div class="order-item-card">
+                            <div class="item-info">
+                                <span class="item-name">@item.ItemNome</span>
+                                <span class="item-quantity">x @item.Quantidade</span>
+                            </div>
+                            <span class="item-total">@item.Subtotal.ToString("C2")</span>
+                        </div>
+                    }
+                </div>
+                
+                <div class="order-total-card">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span>@orderDetails.Subtotal.ToString("C2")</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Desconto:</span>
+                        <span>@orderDetails.Desconto.ToString("C2")</span>
+                    </div>
+                    <div class="total-row final">
+                        <span>Total:</span>
+                        <span>@orderDetails.Total.ToString("C2")</span>
+                    </div>
+                </div>
+                
+                <div class="order-actions">
+                    <button class="btn btn-primary" @onclick="NavigateToHome">
+                        <i class="bi bi-burger"></i> Fazer Novo Pedido
+                    </button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-cart">
+                <i class="bi bi-cart-x"></i>
+                <h2>Seu carrinho está vazio</h2>
+                <p>Adicione itens antes de finalizar o pedido.</p>
+                <button @onclick="NavigateToCart" class="btn btn-primary">
+                    <i class="bi bi-cart"></i> Ir para o Carrinho
+                </button>
+            </div>
+        }
     }
     else
     {
@@ -161,16 +222,44 @@
 </div>
 
 @code {
+    [Parameter]
+    public Guid OrderId { get; set; }
+
     private bool loading = true;
     private bool orderCreated = false;
     private bool placingOrder = false;
     private string? errorMessage;
-    private PedidoResponse? orderResponse;
+    private CreatePedidoResponse? orderResponse;
+    private PedidoDetalhes? orderDetails;
 
     protected override async Task OnInitializedAsync()
     {
-        await CartService.InitializeCartAsync();
-        loading = false;
+        //await CartService.InitializeCartAsync();
+        
+        // Se houver OrderId na URL, buscar os detalhes do pedido
+        if (OrderId != Guid.Empty)
+        {
+            await LoadOrderDetailsAsync(OrderId);
+        }
+        else
+        {
+            loading = false;
+        }
+    }
+
+    private async Task LoadOrderDetailsAsync(Guid orderId)
+    {
+        try
+        {
+            // Buscar os detalhes do pedido pelo ID
+            orderDetails = await OrderService.GetOrderByIdAsync(orderId);
+            loading = false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erro ao carregar pedido: {ex.Message}";
+            loading = false;
+        }
     }
 
     private async Task IncreaseQuantityAsync(Guid itemId)

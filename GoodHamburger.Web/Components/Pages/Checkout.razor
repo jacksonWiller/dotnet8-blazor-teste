@@ -36,7 +36,7 @@
                 <p><strong>Total:</strong> @orderResponse?.Total.ToString("C2")</p>
             </div>
             <button @onclick="NavigateToHome" class="btn btn-primary">
-                <i class="bi bi-burger"></i> Fazer Novo Pedido
+                <i class="bi bi-house-fill"></i> Fazer Novo Pedido
             </button>
         </div>
     }   
@@ -94,8 +94,21 @@
                 
                 <div class="order-actions">
                     <button class="btn btn-primary" @onclick="NavigateToHome">
-                        <i class="bi bi-burger"></i> Fazer Novo Pedido
+                        <i class="bi bi-house-fill"></i> Fazer Novo Pedido
                     </button>
+                    @if (orderDetails.Status != "Cancelado")
+                    {
+                        <button class="btn btn-danger ms-2" @onclick="CancelOrderAsync" disabled="@isCancelling">
+                            @if (isCancelling)
+                            {
+                                <span><i class="bi bi-hourglass-split"></i> Cancelando...</span>
+                            }
+                            else
+                            {
+                                <span><i class="bi bi-x-circle"></i> Cancelar Pedido</span>
+                            }
+                        </button>
+                    }
                 </div>
             </div>
         }
@@ -228,6 +241,7 @@
     private bool loading = true;
     private bool orderCreated = false;
     private bool placingOrder = false;
+    private bool isCancelling = false;
     private string? errorMessage;
     private CreatePedidoResponse? orderResponse;
     private PedidoDetalhes? orderDetails;
@@ -310,6 +324,37 @@
         finally
         {
             placingOrder = false;
+        }
+    }
+
+    private async Task CancelOrderAsync()
+    {
+        if (orderDetails == null) return;
+        isCancelling = true;
+        errorMessage = null;
+        StateHasChanged();
+        try
+        {
+            await OrderService.UpdateOrderAsync(orderDetails.Id, orderDetails.Itens.Select(i => new UpdateOrderItemDto
+            {
+                ItemId = i.ItemId,
+                Quantidade = i.Quantidade
+            }).ToList(), "Cancelado");
+
+            await CartService.ClearCartAsync();
+            await CartService.ClearOrderIdAsync();
+
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erro ao cancelar pedido: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"Erro ao cancelar pedido: {ex.Message}");
+        }
+        finally
+        {
+            isCancelling = false;
+            StateHasChanged();
         }
     }
 

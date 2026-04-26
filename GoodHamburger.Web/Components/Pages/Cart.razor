@@ -4,6 +4,7 @@
 @inject NavigationManager Navigation
 @inject ICartService CartService
 @inject IOrderService OrderService
+@inject IToastService ToastService
 @rendermode InteractiveServer
 
 <div class="cart-page">
@@ -29,7 +30,14 @@
                     var qty = _itemQuantities.ContainsKey(item.ItemId) ? _itemQuantities[item.ItemId] : item.Quantidade;
                     <article class="cart-item">
                         <div class="cart-item-image">
-                            <i class="bi bi-dish-fill"></i>
+                            @if (!string.IsNullOrEmpty(item.UrlImagem))
+                            {
+                                <img src="@item.UrlImagem" alt="@item.ItemNome" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-dish-fill"></i>
+                            }
                         </div>
                         <div class="cart-item-details">
                             <h3>@item.ItemNome</h3>
@@ -82,10 +90,6 @@
                     <div class="delivery-estimate">
                         <i class="bi bi-clock"></i> Entrega estimada: 25-35 min
                     </div>
-                    @if (!string.IsNullOrEmpty(_errorMessage))
-                    {
-                        <div class="alert alert-danger mt-2">@_errorMessage</div>
-                    }
                     <button class="checkout-btn" @onclick="ConfirmOrderAsync" disabled="@_isConfirming">
                         @if (_isConfirming)
                         {
@@ -205,7 +209,27 @@
     private Dictionary<Guid, int> _itemQuantities = new();
     private bool _isLoading = true;
     private bool _isConfirming = false;
-    private string? _errorMessage;
+
+    private static string ParseApiError(string rawMessage)
+    {
+        try
+        {
+            var start = rawMessage.IndexOf('{');
+            if (start < 0) return rawMessage;
+            var json = rawMessage[start..];
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            var errors = doc.RootElement.GetProperty("errors");
+            var messages = new List<string>();
+            foreach (var err in errors.EnumerateArray())
+                if (err.TryGetProperty("message", out var msg))
+                    messages.Add(msg.GetString() ?? string.Empty);
+            return messages.Any() ? string.Join(" | ", messages) : rawMessage;
+        }
+        catch
+        {
+            return rawMessage;
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -239,7 +263,7 @@
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Erro ao carregar pedido: {ex.Message}");
-            _errorMessage = "Erro ao carregar itens do pedido.";
+            ToastService.ShowError(ParseApiError(ex.Message));
         }
 
         _isLoading = false;
@@ -305,7 +329,7 @@
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Erro ao atualizar pedido após remoção: {ex.Message}");
-            _errorMessage = "Erro ao atualizar pedido.";
+            ToastService.ShowError(ParseApiError(ex.Message));
             StateHasChanged();
             return;
         }
@@ -345,7 +369,7 @@
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Erro ao sincronizar itens: {ex.Message}");
-            _errorMessage = "Erro ao atualizar itens do pedido.";
+            ToastService.ShowError(ParseApiError(ex.Message));
         }
         StateHasChanged();
     }
@@ -354,7 +378,6 @@
     {
         if (CartService.OrderId == null) return;
         _isConfirming = true;
-        _errorMessage = null;
         StateHasChanged();
         try
         {
@@ -376,7 +399,7 @@
         }
         catch (Exception ex)
         {
-            _errorMessage = $"Erro ao confirmar pedido: {ex.Message}";
+            ToastService.ShowError(ParseApiError(ex.Message));
             System.Diagnostics.Debug.WriteLine($"Erro ao confirmar pedido: {ex.Message}");
         }
         finally

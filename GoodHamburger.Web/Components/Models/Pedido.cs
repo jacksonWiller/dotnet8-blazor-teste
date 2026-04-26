@@ -18,21 +18,24 @@ public class PedidoItemDto
 {
     [JsonPropertyName("itemId")]
     public Guid ItemId { get; set; }
-    
+
     [JsonPropertyName("itemNome")]
     public string ItemNome { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("categoria")]
     public string Categoria { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("precoUnitario")]
     public decimal PrecoUnitario { get; set; }
-    
+
     [JsonPropertyName("quantidade")]
     public int Quantidade { get; set; }
-    
+
     [JsonPropertyName("subtotal")]
     public decimal Subtotal { get; set; }
+
+    [JsonPropertyName("urlImagem")]
+    public string UrlImagem { get; set; } = string.Empty;
 }
 
 public class PedidoResponse

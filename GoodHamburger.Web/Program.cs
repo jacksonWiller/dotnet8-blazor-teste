@@ -21,6 +21,9 @@ builder.Services.AddHttpClient<IOrderService, OrderService>(client =>
 // Register Cart service
 builder.Services.AddScoped<ICartService, CartService>();
 
+// Register Toast service
+builder.Services.AddScoped<IToastService, ToastService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

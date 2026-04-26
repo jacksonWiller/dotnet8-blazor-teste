@@ -111,7 +111,7 @@
                     <h3>@item.Nome</h3>
                     <p>@item.Descricao</p>
                     <div class="card-footer">
-                        <span class="price">@FormatPrice(item.Preco)</span>
+                        <span class="price">@item.PrecoFormatado</span>
                         <button class="add-btn" @onclick="() => AddToCartAsync(item)">
                             <i class="bi bi-cart-plus"></i> Add
                         </button>
@@ -185,10 +185,5 @@
             "sobremesa" or "dessert" => "ice-cream",
             _ => "emoji-smile"
         };
-    }
-
-    private string FormatPrice(decimal preco)
-    {
-        return preco.ToString("C2").Replace("R$", "R$");
     }
 }

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Dominio.Dtos
 {
     /// <summary>
@@ -24,6 +26,11 @@ namespace Dominio.Dtos
         /// Preço do produto
         /// </summary>
         public decimal Preco { get; set; }
+        
+        /// <summary>
+        /// Preço formatado com símbolo R$
+        /// </summary>
+        public string PrecoFormatado => Preco.ToString("C2", new CultureInfo("pt-BR"));
         
         /// <summary>
         /// Tipo do item: burger, side, drink, dessert, combo

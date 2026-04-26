@@ -16,6 +16,9 @@ public class ItemDto
     [System.Text.Json.Serialization.JsonPropertyName("preco")]
     public decimal Preco { get; set; }
     
+    [System.Text.Json.Serialization.JsonPropertyName("precoFormatado")]
+    public string? PrecoFormatado { get; set; }
+    
     [System.Text.Json.Serialization.JsonPropertyName("tipo")]
     public string Tipo { get; set; } = string.Empty;
     

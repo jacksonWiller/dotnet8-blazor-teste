@@ -8,14 +8,16 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Add HttpClient for API calls
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7113/";
+
 builder.Services.AddHttpClient<IItemService, ItemService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7113/");
+    client.BaseAddress = new Uri(apiBaseUrl);
 });
 
 builder.Services.AddHttpClient<IOrderService, OrderService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7113/");
+    client.BaseAddress = new Uri(apiBaseUrl);
 });
 
 // Register Cart service

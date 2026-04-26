@@ -11,22 +11,22 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 
-COPY ["Clientes.Api/Clientes.Api.csproj", "Clientes.Api/"]
-COPY ["Clientes.Aplicacao/Clientes.Aplicacao.csproj", "Clientes.Aplicacao/"]
-COPY ["Clientes.Dominio/Clientes.Dominio.csproj", "Clientes.Dominio/"]
-COPY ["Clientes.Infra/Clientes.Infra.csproj", "Clientes.Infra/"]
+COPY ["Api/Api.csproj", "Api/"]
+COPY ["Aplicacao/Aplicacao.csproj", "Aplicacao/"]
+COPY ["Dominio/Dominio.csproj", "Dominio/"]
+COPY ["Infra/Infra.csproj", "Infra/"]
 
-RUN dotnet restore "Clientes.Api/Clientes.Api.csproj"
+RUN dotnet restore "Api/Api.csproj"
 COPY . .
 
-WORKDIR "Clientes.Api/"
-RUN dotnet build "Clientes.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "Api/"
+RUN dotnet build "Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Clientes.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Clientes.Api.dll"]
+ENTRYPOINT ["dotnet", "Api.dll"]

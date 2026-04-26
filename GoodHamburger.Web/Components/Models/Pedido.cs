@@ -83,7 +83,7 @@ public class PedidoDetalhes
     public decimal Total { get; set; }
     
     [JsonPropertyName("status")]
-    public int Status { get; set; } = 0;
+    public string Status { get; set; } = string.Empty;
     
     [JsonPropertyName("dataCriacao")]
     public DateTime DataCriacao { get; set; }

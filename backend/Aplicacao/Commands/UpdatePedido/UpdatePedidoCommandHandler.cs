@@ -45,6 +45,19 @@ namespace Aplicacao.Commands.UpdatePedido
                 return Result<UpdatePedidoCommandResponse>.NotFound($"Pedido com ID {request.Id} não encontrado.");
             }
 
+            // Verificar IDs duplicados no request
+            var idsDuplicados = request.Itens
+                .GroupBy(i => i.ItemId)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (idsDuplicados.Count != 0)
+            {
+                return Result<UpdatePedidoCommandResponse>.Error(
+                    $"Itens duplicados no pedido: {string.Join(", ", idsDuplicados.Select(id => id.ToString()))}");
+            }
+
             // Atualizar status do pedido
             pedido.AtualizarStatus(request.Status);
 

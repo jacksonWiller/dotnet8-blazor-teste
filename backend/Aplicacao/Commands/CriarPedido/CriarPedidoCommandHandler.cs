@@ -41,6 +41,19 @@ namespace Aplicacao.Commands.CriarPedido
                 return Result<CriarPedidoCommandResponse>.Invalid(validationResult.AsErrors());
             }
 
+            // Verificar IDs duplicados no request
+            var idsDuplicados = request.ItensIds
+                .GroupBy(id => id)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (idsDuplicados.Count != 0)
+            {
+                return Result<CriarPedidoCommandResponse>.Error(
+                    $"Itens duplicados no pedido: {string.Join(", ", idsDuplicados.Select(id => id.ToString()))}");
+            }
+
             // Criar pedido
             var pedido = new Pedido(Guid.NewGuid());
 

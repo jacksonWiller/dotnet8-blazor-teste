@@ -83,10 +83,10 @@ public class OrderService : IOrderService
     {
         var request = new
         {
-            itens = itens.Select(i => new { i.ItemId, i.Quantidade }),
+            itens = itens,
             status = novoStatus
         };
-        
+
         var response = await _httpClient.PutAsJsonAsync($"api/Pedidos/{orderId}", request);
         
         if (!response.IsSuccessStatusCode)

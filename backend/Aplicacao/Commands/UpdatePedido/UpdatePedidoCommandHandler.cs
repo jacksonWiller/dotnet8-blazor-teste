@@ -79,8 +79,16 @@ namespace Aplicacao.Commands.UpdatePedido
             }
 
             // Salvar alterações
-            await _pedidoRepository.AtualizarAsync(pedido);
+            try
+            {
+                await _pedidoRepository.AtualizarAsync(pedido);
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
+       
             var response = new UpdatePedidoCommandResponse
             {
                 PedidoId = pedido.Id,

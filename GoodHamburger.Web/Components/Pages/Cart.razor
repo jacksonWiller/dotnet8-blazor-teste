@@ -307,14 +307,14 @@
         {
             var orderId = CartService.OrderId.Value;
 
-            var itens = _itemQuantities.Select(kvp => new UpdateOrderItemDto
+            var itens = CartService.Items.Select(item => new UpdateOrderItemDto
             {
-                ItemId = kvp.Key,
-                Quantidade = kvp.Value
+                ItemId = item.ItemId,
+                Quantidade = item.Quantity
             }).ToList();
 
-            // Atualiza o pedido com os itens editados e muda status para Finalizado
-            await OrderService.UpdateOrderAsync(orderId, itens, "Finalizado");
+            // Atualiza o pedido com os itens do carrinho e muda status para EmPreparacao (1)
+            await OrderService.UpdateOrderAsync(orderId, itens, "EmPreparacao");
 
             await CartService.ClearCartAsync();
             await CartService.ClearOrderIdAsync();

@@ -81,7 +81,16 @@ namespace Infra.Repositorio
 
         public async Task AtualizarAsync(Pedido pedido)
         {
-            _dataContext.Pedidos.Update(pedido);
+            var itensAntigos = await _dataContext.PedidoItens
+                .Where(i => i.PedidoId == pedido.Id)
+                .ToListAsync();
+
+            _dataContext.PedidoItens.RemoveRange(itensAntigos);
+
+            _dataContext.Entry(pedido).State = EntityState.Modified;
+
+            await _dataContext.PedidoItens.AddRangeAsync(pedido.Itens);
+
             await _dataContext.SaveChangesAsync();
         }
     }

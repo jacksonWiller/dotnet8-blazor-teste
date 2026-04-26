@@ -37,7 +37,7 @@ namespace Dominio.Entidades
         /// </summary>
         public void AdicionarItem(Item item)
         {
-            ValidarItem(item, 1);
+            ValidarItem(item);
 
             var pedidoItem = new PedidoItem(Id, item.Id, item.Nome, item.Categoria, item.Preco);
             Itens.Add(pedidoItem);
@@ -47,49 +47,34 @@ namespace Dominio.Entidades
         }
 
         /// <summary>
-        /// Valida se o item pode ser adicionado ao pedido e se a quantidade é permitida
+        /// Valida se o item pode ser adicionado ao pedido
         /// </summary>
-        private static string Normalizar(string texto) =>
-            new string(
-                texto.Normalize(System.Text.NormalizationForm.FormD)
-                     .Where(c => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)
-                     .ToArray()
-            ).ToLowerInvariant();
-
-        private static bool CategoriaContem(string categoria, string termo) =>
-            Normalizar(categoria).Contains(Normalizar(termo));
-
-        private void ValidarItem(Item item, int quantidade = 1)
+        private void ValidarItem(Item item)
         {
-            if (CategoriaContem(item.Categoria, "Sanduiche") || CategoriaContem(item.Categoria, "Sanduiches"))
-            {
-                if (TemSanduiche())
-                    throw new ArgumentException("Não é permitido adicionar mais de um sanduíche ao pedido.");
-                if (quantidade > 1)
-                    throw new ArgumentException("Não é permitido adicionar mais de uma unidade de sanduíche ao pedido.");
-            }
+            if (item.Categoria.Contains("Sanduiche") && TemSanduiche())
+                throw new ArgumentException("Não é permitido adicionar mais de um sanduíche ao pedido.");
 
-            if (CategoriaContem(item.Categoria, "Acompanhamento"))
-            {
-                if (TemBatata())
-                    throw new ArgumentException("Não é permitido adicionar mais de um acompanhamento ao pedido.");
-                if (quantidade > 1)
-                    throw new ArgumentException("Não é permitido adicionar mais de uma unidade de acompanhamento ao pedido.");
-            }
+            if (item.Categoria.Contains("Acompanhamento") && TemAcompanhamento())
+                throw new ArgumentException("Não é permitido adicionar mais de um acompanhamento ao pedido.");
 
-            if (CategoriaContem(item.Categoria, "Bebida"))
-            {
-                if (TemRefrigerante())
-                    throw new ArgumentException("Não é permitido adicionar mais de uma bebida ao pedido.");
-                if (quantidade > 1)
-                    throw new ArgumentException("Não é permitido adicionar mais de uma unidade de bebida ao pedido.");
-            }
+            if (item.Categoria.Contains("Bebida") && TemBebida())
+                throw new ArgumentException("Não é permitido adicionar mais de uma bebida ao pedido.");
         }
 
         /// <summary>
         /// Verifica se o pedido já tem um sanduíche
         /// </summary>
-        private bool TemSanduiche() => Itens.Any(i => CategoriaContem(i.Categoria, "Sanduiche") || CategoriaContem(i.Categoria, "Sanduiches"));
+        private bool TemSanduiche() => Itens.Any(i => i.Categoria.Contains("Sanduiche"));
+
+        /// <summary>
+        /// Verifica se o pedido já tem acompanhamento
+        /// </summary>
+        private bool TemAcompanhamento() => Itens.Any(i => i.Categoria.Contains("Acompanhamento"));
+
+        /// <summary>
+        /// Verifica se o pedido já tem bebida
+        /// </summary>
+        private bool TemBebida() => Itens.Any(i => i.Categoria.Contains("Bebida"));
 
         /// <summary>
         /// Recalcula subtotal, desconto e total
@@ -104,7 +89,7 @@ namespace Dominio.Entidades
         /// <summary>
         /// Calcula o subtotal de todos os itens
         /// </summary>
-        private decimal CalcularSubtotal() => Itens.Sum(i => i.PrecoUnitario * i.Quantidade);
+        private decimal CalcularSubtotal() => Itens.Sum(i => i.PrecoUnitario);
 
         /// <summary>
         /// Calcula o desconto baseado nas regras de negócio
@@ -134,12 +119,12 @@ namespace Dominio.Entidades
         /// <summary>
         /// Verifica se o pedido já tem batata
         /// </summary>
-        private bool TemBatata() => Itens.Any(i => CategoriaContem(i.Categoria, "Acompanhamento"));
+        private bool TemBatata() => Itens.Any(i => i.Categoria.Contains("Batata"));
 
         /// <summary>
         /// Verifica se o pedido já tem refrigerante
         /// </summary>
-        private bool TemRefrigerante() => Itens.Any(i => CategoriaContem(i.Categoria, "Bebida"));
+        private bool TemRefrigerante() => Itens.Any(i => i.Categoria.Contains("Refrigerante"));
 
         /// <summary>
         /// Muda o status do pedido com validação de transição
@@ -210,7 +195,7 @@ namespace Dominio.Entidades
         /// </summary>
         public void AdicionarItemComQuantidade(Item item, int quantidade)
         {
-            ValidarItem(item, quantidade);
+            ValidarItem(item);
 
             var pedidoItem = new PedidoItem(Id, item.Id, item.Nome, item.Categoria, item.Preco, quantidade);
             Itens.Add(pedidoItem);

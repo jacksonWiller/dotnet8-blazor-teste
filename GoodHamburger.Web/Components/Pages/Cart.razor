@@ -265,15 +265,37 @@
 
     private async Task RemoveOrderItemAsync(Guid itemId)
     {
+        // 1. Remove do CartService local
+        await CartService.RemoveItemAsync(itemId);
         _itemQuantities.Remove(itemId);
-        if (_orderDetails != null)
-            _orderDetails.Itens.RemoveAll(i => i.ItemId == itemId);
-        await SyncOrderItemsAsync();
+
+        // 2. Atualiza o pedido na API com os itens restantes
+        if (CartService.OrderId == null) return;
+        try
+        {
+            var itens = _itemQuantities.Select(kvp => new UpdateOrderItemDto
+            {
+                ItemId = kvp.Key,
+                Quantidade = kvp.Value
+            }).ToList();
+
+            await OrderService.UpdateOrderAsync(CartService.OrderId.Value, itens, "Pendente");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erro ao atualizar pedido após remoção: {ex.Message}");
+            _errorMessage = "Erro ao atualizar pedido.";
+            StateHasChanged();
+            return;
+        }
+
+        // 3. Faz GET para carregar o pedido atualizado com totais recalculados
+        await LoadOrderFromApiAsync();
     }
 
     private async Task SyncOrderItemsAsync()
     {
-        if (_orderDetails == null || CartService.OrderId == null) return;
+        if (CartService.OrderId == null) return;
         try
         {
             var itens = _itemQuantities.Select(kvp => new UpdateOrderItemDto
@@ -285,8 +307,18 @@
             var updated = await OrderService.UpdateOrderAsync(CartService.OrderId.Value, itens, "Pendente");
             if (updated != null)
             {
+                // Atualiza _orderDetails com os dados completos da API (subtotal, desconto, total recalculados)
                 _orderDetails = updated;
                 _itemQuantities = _orderDetails.Itens.ToDictionary(i => i.ItemId, i => i.Quantidade);
+
+                // Sincroniza o CartService: remove itens que já não estão no pedido
+                var updatedIds = _orderDetails.Itens.Select(i => i.ItemId).ToHashSet();
+                foreach (var removedId in CartService.Items.Select(i => i.ItemId).Except(updatedIds).ToList())
+                    await CartService.RemoveItemAsync(removedId);
+
+                // Atualiza quantidades no CartService
+                foreach (var item in _orderDetails.Itens)
+                    await CartService.UpdateQuantityAsync(item.ItemId, item.Quantidade);
             }
         }
         catch (Exception ex)
@@ -307,10 +339,10 @@
         {
             var orderId = CartService.OrderId.Value;
 
-            var itens = CartService.Items.Select(item => new UpdateOrderItemDto
+            var itens = _itemQuantities.Select(kvp => new UpdateOrderItemDto
             {
-                ItemId = item.ItemId,
-                Quantidade = item.Quantity
+                ItemId = kvp.Key,
+                Quantidade = kvp.Value
             }).ToList();
 
             // Atualiza o pedido com os itens do carrinho e muda status para EmPreparacao (1)

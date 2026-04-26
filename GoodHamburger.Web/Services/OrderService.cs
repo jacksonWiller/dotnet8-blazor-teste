@@ -13,6 +13,7 @@ public interface IOrderService
     Task<PagedPedidoResponse> GetAllOrdersAsync(int pageNumber = 1, int pageSize = 10);
     Task<PedidoDetalhes?> UpdateOrderAsync(Guid orderId, List<UpdateOrderItemDto> itens, string novoStatus);
     Task<PedidoDetalhes?> CancelOrderAsync(Guid orderId);
+    Task DeleteOrderAsync(Guid orderId);
 }
 
 public class OrderService : IOrderService
@@ -152,6 +153,21 @@ public class OrderService : IOrderService
         }
         
         return result?.Result?.Pedido;
+    }
+
+    /// <summary>
+    /// Deleta um pedido pelo ID
+    /// </summary>
+    public async Task DeleteOrderAsync(Guid orderId)
+    {
+        var response = await _httpClient.DeleteAsync($"api/Pedidos/{orderId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException(
+                $"Erro ao deletar pedido: {response.StatusCode} - {errorContent}");
+        }
     }
 
     //Task<PedidoResponse?> IOrderService.GetOrderByIdAsync(Guid orderId)

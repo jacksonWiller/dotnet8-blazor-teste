@@ -269,8 +269,29 @@
         await CartService.RemoveItemAsync(itemId);
         _itemQuantities.Remove(itemId);
 
-        // 2. Atualiza o pedido na API com os itens restantes
         if (CartService.OrderId == null) return;
+
+        // 2. Se não restam itens, deleta o pedido e volta para Home
+        if (!_itemQuantities.Any())
+        {
+            try
+            {
+                await OrderService.DeleteOrderAsync(CartService.OrderId.Value);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro ao deletar pedido: {ex.Message}");
+            }
+            finally
+            {
+                await CartService.ClearCartAsync();
+                await CartService.ClearOrderIdAsync();
+                Navigation.NavigateTo("/");
+            }
+            return;
+        }
+
+        // 3. Ainda há itens: atualiza o pedido na API
         try
         {
             var itens = _itemQuantities.Select(kvp => new UpdateOrderItemDto
@@ -289,7 +310,7 @@
             return;
         }
 
-        // 3. Faz GET para carregar o pedido atualizado com totais recalculados
+        // 4. GET para recarregar o pedido atualizado com totais recalculados
         await LoadOrderFromApiAsync();
     }
 

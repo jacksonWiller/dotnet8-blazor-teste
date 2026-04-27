@@ -4,6 +4,7 @@
 @inject NavigationManager Navigation
 @inject ICartService CartService
 @inject IOrderService OrderService
+@inject IItemService ItemService
 @inject IToastService ToastService
 @rendermode InteractiveServer
 
@@ -28,11 +29,12 @@
                 @foreach (var item in _orderDetails.Itens)
                 {
                     var qty = _itemQuantities.ContainsKey(item.ItemId) ? _itemQuantities[item.ItemId] : item.Quantidade;
+                    var imgUrl = _itemImages.TryGetValue(item.ItemId, out var url) ? url : null;
                     <article class="cart-item">
                         <div class="cart-item-image">
-                            @if (!string.IsNullOrEmpty(item.UrlImagem))
+                            @if (!string.IsNullOrEmpty(imgUrl))
                             {
-                                <img src="@item.UrlImagem" alt="@item.ItemNome" />
+                                <img src="@imgUrl" alt="@item.ItemNome" />
                             }
                             else
                             {
@@ -53,7 +55,7 @@
                             </div>
                         </div>
                         <div class="cart-item-price">
-                            <span class="price">@item.PrecoUnitario.ToString("C2")</span>
+                            <span class="price">@item.PrecoUnitario.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                             <button class="remove-btn" @onclick="() => RemoveOrderItemAsync(item.ItemId)">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -69,23 +71,23 @@
                 <div class="summary-body">
                     <div class="summary-row">
                         <span>Subtotal</span>
-                        <span><strong>@_orderDetails.Subtotal.ToString("C2")</strong></span>
+                        <span><strong>@_orderDetails.Subtotal.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</strong></span>
                     </div>
                     @if (_orderDetails.Desconto > 0)
                     {
                         <div class="summary-row discount">
                             <span><i class="bi bi-tag"></i> Desconto</span>
-                            <span>- @_orderDetails.Desconto.ToString("C2")</span>
+                            <span>- @_orderDetails.Desconto.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                         </div>
                     }
                     <div class="summary-row">
                         <span>Taxa de Entrega</span>
-                        <span><strong>@CartService.DeliveryFee.ToString("C2")</strong></span>
+                        <span><strong>@CartService.DeliveryFee.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</strong></span>
                     </div>
                     <div class="divider"></div>
                     <div class="total-row">
                         <span>Total</span>
-                        <span class="total-amount">@_orderDetails.Total.ToString("C2")</span>
+                        <span class="total-amount">@_orderDetails.Total.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                     </div>
                     <div class="delivery-estimate">
                         <i class="bi bi-clock"></i> Entrega estimada: 25-35 min
@@ -137,7 +139,7 @@
                             </div>
                         </div>
                         <div class="cart-item-price">
-                            <span class="price">@item.Preco.ToString("C2")</span>
+                            <span class="price">@item.Preco.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                             <button class="remove-btn" @onclick="() => RemoveItemAsync(item.ItemId)">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -153,23 +155,23 @@
                 <div class="summary-body">
                     <div class="summary-row">
                         <span>Subtotal</span>
-                        <span><strong>@CartService.Subtotal.ToString("C2")</strong></span>
+                        <span><strong>@CartService.Subtotal.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</strong></span>
                     </div>
                     @if (CartService.Discount > 0)
                     {
                         <div class="summary-row discount">
                             <span><i class="bi bi-tag"></i> Desconto</span>
-                            <span>- @CartService.Discount.ToString("C2")</span>
+                            <span>- @CartService.Discount.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                         </div>
                     }
                     <div class="summary-row">
                         <span>Taxa de Entrega</span>
-                        <span><strong>@CartService.DeliveryFee.ToString("C2")</strong></span>
+                        <span><strong>@CartService.DeliveryFee.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</strong></span>
                     </div>
                     <div class="divider"></div>
                     <div class="total-row">
                         <span>Total</span>
-                        <span class="total-amount">@CartService.Total.ToString("C2")</span>
+                        <span class="total-amount">@CartService.Total.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                     </div>
                     <div class="delivery-estimate">
                         <i class="bi bi-clock"></i> Entrega estimada: 25-35 min
@@ -207,6 +209,7 @@
 @code {
     private PedidoDetalhes? _orderDetails;
     private Dictionary<Guid, int> _itemQuantities = new();
+    private Dictionary<Guid, string?> _itemImages = new();
     private bool _isLoading = true;
     private bool _isConfirming = false;
 
@@ -229,6 +232,26 @@
         {
             return rawMessage;
         }
+    }
+
+    private async Task LoadItemImagesAsync(List<Guid> itemIds)
+    {
+        var tasks = itemIds.Select(async id =>
+        {
+            try
+            {
+                var item = await ItemService.GetItemByIdAsync(id);
+                if (item != null)
+                    _itemImages[id] = item.UrlImagem;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro ao buscar imagem do item {id}: {ex.Message}");
+            }
+        });
+
+        await Task.WhenAll(tasks);
+        await InvokeAsync(StateHasChanged);
     }
 
     protected override void OnInitialized()
@@ -257,6 +280,7 @@
                 if (_orderDetails != null)
                 {
                     _itemQuantities = _orderDetails.Itens.ToDictionary(i => i.ItemId, i => i.Quantidade);
+                    _ = LoadItemImagesAsync(_orderDetails.Itens.Select(i => i.ItemId).ToList());
                 }
             }
         }

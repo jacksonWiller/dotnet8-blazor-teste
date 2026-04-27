@@ -33,7 +33,7 @@
             <p>Obrigado pela sua compra!</p>
             <div class="order-details">
                 <p><strong>ID do Pedido:</strong> @orderResponse?.PedidoId.ToString().ToUpper()</p>
-                <p><strong>Total:</strong> @orderResponse?.Total.ToString("C2")</p>
+                <p><strong>Total:</strong> @orderResponse?.Total.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</p>
             </div>
             <button @onclick="NavigateToHome" class="btn btn-primary">
                 <i class="bi bi-house-fill"></i> Fazer Novo Pedido
@@ -72,7 +72,7 @@
                                 <span class="item-name">@item.ItemNome</span>
                                 <span class="item-quantity">x @item.Quantidade</span>
                             </div>
-                            <span class="item-total">@item.Subtotal.ToString("C2")</span>
+                            <span class="item-total">@item.Subtotal.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                         </div>
                     }
                 </div>
@@ -80,15 +80,15 @@
                 <div class="order-total-card">
                     <div class="total-row">
                         <span>Subtotal:</span>
-                        <span>@orderDetails.Subtotal.ToString("C2")</span>
+                        <span>@orderDetails.Subtotal.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                     </div>
                     <div class="total-row">
                         <span>Desconto:</span>
-                        <span>@orderDetails.Desconto.ToString("C2")</span>
+                        <span>@orderDetails.Desconto.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                     </div>
                     <div class="total-row final">
                         <span>Total:</span>
-                        <span>@orderDetails.Total.ToString("C2")</span>
+                        <span>@orderDetails.Total.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                     </div>
                 </div>
                 
@@ -153,7 +153,7 @@
                                         <small class="text-muted">@item.Categoria</small>
                                     </div>
                                     <div class="col-md-3 text-md-end">
-                                        <span class="item-price">@item.Preco.ToString("C2")</span>
+                                        <span class="item-price">@item.Preco.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                                     </div>
                                     <div class="col-12">
                                         <div class="quantity-control d-flex align-items-center justify-content-between justify-content-md-center gap-3">
@@ -189,26 +189,26 @@
 
                         <div class="summary-row">
                             <span>Subtotal</span>
-                            <span>@CartService.Subtotal.ToString("C2")</span>
+                            <span>@CartService.Subtotal.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                         </div>
 
                         @if (CartService.Discount > 0)
                         {
                             <div class="summary-row discount">
                                 <span><i class="bi bi-tag"></i> Desconto</span>
-                                <span>- @CartService.Discount.ToString("C2")</span>
+                                <span>- @CartService.Discount.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                             </div>
                         }
 
                         <div class="summary-row">
                             <span>Taxa de Entrega</span>
-                            <span>@CartService.DeliveryFee.ToString("C2")</span>
+                            <span>@CartService.DeliveryFee.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                         </div>
 
                         <div class="summary-total">
                             <span>Total</span>
                             <div>
-                                <span class="total-price">@CartService.Total.ToString("C2")</span>
+                                <span class="total-price">@CartService.Total.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                                 <span class="estimated-delivery">Entrega estimada: 25-35 min</span>
                             </div>
                         </div>

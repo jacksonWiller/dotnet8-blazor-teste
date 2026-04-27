@@ -4,7 +4,128 @@
 
 ---
 
-## 📌 Sobre o Desafio
+## �️ Telas da Aplicação
+
+Abaixo estão detalhadas todas as telas do sistema, com capturas de tela e os endpoints da API utilizados em cada uma:
+
+### 🏠 Tela Inicial (Menu/Cardápio)
+
+**URL:** `/`
+
+**Descrição:** Tela principal que exibe o cardápio completo da hamburgueria, organizado por categorias (Sanduíches, Acompanhamentos, Bebidas e Sobremesas). Os usuários podem navegar entre as categorias, visualizar os produtos com suas imagens, nomes, descrições e preços. Cada produto pode ser adicionado ao carrinho de compras com um único clique.
+
+**Funcionalidades:**
+- Exibição de produtos filtrados por categoria
+- Adição de itens ao carrinho
+- Cálculo em tempo real do total do carrinho
+- Notificações visuais ao adicionar itens
+
+**Endpoints da API utilizados:**
+| Endpoint | Método | Descrição |
+|---|---|---|
+| `GET /api/itens` | GET | Lista todos os itens do cardápio disponíveis |
+
+**Captura de tela:**
+![Menu/Cardápio](https://raw.githubusercontent.com/jacksonWiller/dotnet8-blazor-teste/refs/heads/main/img/menu.png)
+
+---
+
+### 🛒 Tela do Carrinho
+
+**URL:** `/cart`
+
+**Descrição:** Tela que exibe todos os itens adicionados pelo usuário, permitindo ajustar quantidades, remover itens e visualizar o resumo do pedido com subtotal, descontos aplicados, taxa de entrega e total. O usuário pode confirmar o pedido para prosseguir para o checkout.
+
+**Funcionalidades:**
+- Listagem de itens adicionados com imagens
+- Controle de quantidade por item (+/-)
+- Remoção de itens do carrinho
+- Cálculo automático de descontos baseado nas regras de negócio
+- Visualização do subtotal, desconto, taxa de entrega e total
+- Confirmação do pedido
+
+**Endpoints da API utilizados:**
+| Endpoint | Método | Descrição |
+|---|---|---|
+| `POST /api/pedidos` | POST | Cria um novo pedido com os itens do carrinho |
+| `GET /api/pedidos/{id}` | GET | Busca detalhes do pedido criado para exibição |
+
+**Captura de tela:**
+![Carrinho de Compras](https://raw.githubusercontent.com/jacksonWiller/dotnet8-blazor-teste/refs/heads/main/img/cart.png)
+
+---
+
+### ✅ Tela de Checkout/Confirmação
+
+**URL:** `/checkout` ou `/checkout/{OrderId}`
+
+**Descrição:** Tela exibida após a confirmação do pedido. Mostra a mensagem de sucesso com os detalhes do pedido criado (ID e total) e oferece a opção de realizar um novo pedido. Também permite visualizar detalhes de pedidos existentes caso um OrderId seja passado na URL.
+
+**Funcionalidades:**
+- Mensagem de confirmação de pedido criado
+- Exibição do ID do pedido e valor total
+- Opção de realizar novo pedido
+- Visualização de detalhes de pedidos existentes
+
+**Endpoints da API utilizados:**
+| Endpoint | Método | Descrição |
+|---|---|---|
+| `POST /api/pedidos` | POST | Cria o pedido confirmado no carrinho |
+| `GET /api/pedidos/{id}` | GET | Busca detalhes do pedido para exibição |
+
+**Captura de tela:**
+![Checkout/Confirmação](https://raw.githubusercontent.com/jacksonWiller/dotnet8-blazor-teste/refs/heads/main/img/checkout.png)
+
+---
+
+### 📋 Tela de Listagem de Pedidos
+
+**URL:** `/orders`
+
+**Descrição:** Tela que exibe uma tabela com todos os pedidos realizados, mostrando informações resumidas como ID do pedido, itens, valor total, data de criação e status. Permite ao usuário visualizar todos os seus pedidos e acessar os detalhes de cada um.
+
+**Funcionalidades:**
+- Listagem paginada de todos os pedidos
+- Exibição de resumo dos itens de cada pedido
+- Formatação de data e valores monetários
+- Navegação para detalhes do pedido
+- Estatísticas de pedidos
+
+**Endpoints da API utilizados:**
+| Endpoint | Método | Descrição |
+|---|---|---|
+| `GET /api/pedidos` | GET | Lista todos os pedidos com paginação |
+| `GET /api/pedidos/{id}` | GET | Busca detalhes completos de um pedido específico |
+
+**Captura de tela:**
+![Listagem de Pedidos](https://raw.githubusercontent.com/jacksonWiller/dotnet8-blazor-teste/refs/heads/main/img/orders.png)
+
+---
+
+### 📊 Tela de Detalhes do Pedido
+
+**URL:** `/orders/{OrderId}` ou `/order/{OrderId}`
+
+**Descrição:** Tela que exibe informações detalhadas de um pedido específico, incluindo linha do tempo do status do pedido, lista completa de itens com quantidades e preços, resumo financeiro com subtotal, descontos e total. Oferece opções para rastrear o pedido ou realizar novos pedidos.
+
+**Funcionalidades:**
+- Visualização completa do pedido
+- Linha do tempo com status do pedido (Confirmado, Preparando, Pronto para entrega)
+- Lista detalhada de todos os itens
+- Resumo financeiro completo
+- Botão para rastrear pedido
+- Navegação para listagem de pedidos
+
+**Endpoints da API utilizados:**
+| Endpoint | Método | Descrição |
+|---|---|---|
+| `GET /api/pedidos/{id}` | GET | Busca todos os detalhes do pedido específico |
+
+**Captura de tela:**
+![Detalhes do Pedido](https://raw.githubusercontent.com/jacksonWiller/dotnet8-blazor-teste/refs/heads/main/img/order.png)
+
+---
+
 
 Este projeto foi desenvolvido como resposta a um teste técnico que solicitava a criação de uma API REST para gerenciamento de pedidos de uma hamburgueria fictícia, a **GoodHamburger**. O sistema permite montar pedidos com itens do cardápio (sanduíches, acompanhamentos e bebidas), aplicando regras de desconto automáticas com base na combinação de itens escolhidos.
 

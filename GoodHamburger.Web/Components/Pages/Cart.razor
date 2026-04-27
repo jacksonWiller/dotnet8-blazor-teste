@@ -287,8 +287,10 @@
     private async Task IncreaseOrderItemQuantityAsync(Guid itemId)
     {
         if (!_itemQuantities.ContainsKey(itemId)) return;
-        _itemQuantities[itemId]++;
-        await SyncOrderItemsAsync();
+        var item = _orderDetails?.Itens.FirstOrDefault(i => i.ItemId == itemId);
+        var categoria = item?.Categoria ?? "item";
+        ToastService.ShowError($"Não é permitido adicionar mais de uma unidade do mesmo tipo ({categoria}) por pedido.");
+        StateHasChanged();
     }
 
     private async Task DecreaseOrderItemQuantityAsync(Guid itemId)
@@ -433,7 +435,10 @@
     {
         var item = CartService.Items.FirstOrDefault(i => i.ItemId == itemId);
         if (item != null)
-            await CartService.UpdateQuantityAsync(itemId, item.Quantity + 1);
+        {
+            ToastService.ShowError($"Não é permitido adicionar mais de uma unidade do mesmo tipo ({item.Tipo}) por pedido.");
+            StateHasChanged();
+        }
     }
 
     private async Task DecreaseQuantityAsync(Guid itemId)

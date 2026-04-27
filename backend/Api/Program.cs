@@ -18,9 +18,9 @@ builder.Services.AddScoped<IGoodHamburgerContext, GoodHamburgerContext>();
 
 builder.Services.AddDbContext<GoodHamburgerContext>(options =>
 {
-    options.UseNpgsql("Host=postgres;Port=5432;Database=postgres;Username=postgres;Password=postgres"); //docker
+    //options.UseNpgsql("Host=postgres;Port=5432;Database=postgres;Username=postgres;Password=postgres"); //docker
 
-    //options.UseNpgsql("Host=localhost;Port=5432;Database=goodhamburger_db;Username=postgres;Password=postgres"); //local
+    options.UseNpgsql("Host=localhost;Port=5432;Database=goodhamburger_db;Username=postgres;Password=postgres"); //local
 });
 
 // Registrar todos os handlers do MediatR automaticamente da assembly Aplicacao

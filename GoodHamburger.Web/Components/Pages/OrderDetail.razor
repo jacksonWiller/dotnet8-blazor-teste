@@ -41,15 +41,7 @@ else
                 <h1>Pedido #@order.Id</h1>
                 <p class="order-detail-subtitle">Criado em @order.DataCriacao.ToString("dd/MM/yyyy HH:mm")</p>
             </div>
-
-            <div class="order-detail-actions">
-                <button class="btn-filter" type="button" @onclick="EditOrder">
-                    <i class="bi bi-pencil"></i> Editar
-                </button>
-                <button class="btn-filter btn-filter-danger" type="button" @onclick="CancelOrderAsync">
-                    <i class="bi bi-x-circle"></i> Remover
-                </button>
-            </div>
+     
         </div>
 
         <div class="order-detail-timeline">

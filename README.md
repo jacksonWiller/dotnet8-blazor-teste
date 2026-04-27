@@ -120,6 +120,7 @@ Abaixo estão detalhadas todas as telas do sistema, com capturas de tela e os en
 | Endpoint | Método | Descrição |
 |---|---|---|
 | `GET /api/pedidos/{id}` | GET | Busca todos os detalhes do pedido específico |
+| `DELETE /api/pedidos/{id}` | DELETE | **Cancela o pedido** (disponível apenas para pedidos em certos status) |
 
 **Captura de tela:**
 ![Detalhes do Pedido](https://raw.githubusercontent.com/jacksonWiller/dotnet8-blazor-teste/refs/heads/main/img/order.png)

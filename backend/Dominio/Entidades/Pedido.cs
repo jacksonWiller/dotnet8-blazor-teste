@@ -51,30 +51,24 @@ namespace Dominio.Entidades
         /// </summary>
         private void ValidarItem(Item item)
         {
-            if (item.Categoria.Contains("Sanduiche") && TemSanduiche())
+            if (item.Categoria.Contains("Sanduíche", StringComparison.OrdinalIgnoreCase) && TemSanduiche())
                 throw new ArgumentException("Não é permitido adicionar mais de um sanduíche ao pedido.");
 
-            if (item.Categoria.Contains("Acompanhamento") && TemAcompanhamento())
+            if (item.Categoria.Contains("Acompanhamento", StringComparison.OrdinalIgnoreCase) && TemAcompanhamento())
                 throw new ArgumentException("Não é permitido adicionar mais de um acompanhamento ao pedido.");
 
-            if (item.Categoria.Contains("Bebida") && TemBebida())
+            if (item.Categoria.Contains("Bebida", StringComparison.OrdinalIgnoreCase) && TemBebida())
                 throw new ArgumentException("Não é permitido adicionar mais de uma bebida ao pedido.");
         }
 
         /// <summary>
         /// Verifica se o pedido já tem um sanduíche
         /// </summary>
-        private bool TemSanduiche() => Itens.Any(i => i.Categoria.Contains("Sanduiche"));
+        private bool TemSanduiche() => Itens.Any(i => i.Categoria.Contains("Sanduíche", StringComparison.OrdinalIgnoreCase));
 
-        /// <summary>
-        /// Verifica se o pedido já tem acompanhamento
-        /// </summary>
-        private bool TemAcompanhamento() => Itens.Any(i => i.Categoria.Contains("Acompanhamento"));
+        private bool TemAcompanhamento() => Itens.Any(i => i.Categoria.Contains("Acompanhamento", StringComparison.OrdinalIgnoreCase));
 
-        /// <summary>
-        /// Verifica se o pedido já tem bebida
-        /// </summary>
-        private bool TemBebida() => Itens.Any(i => i.Categoria.Contains("Bebida"));
+        private bool TemBebida() => Itens.Any(i => i.Categoria.Contains("Bebida", StringComparison.OrdinalIgnoreCase));
 
         /// <summary>
         /// Recalcula subtotal, desconto e total
@@ -119,12 +113,12 @@ namespace Dominio.Entidades
         /// <summary>
         /// Verifica se o pedido já tem batata
         /// </summary>
-        private bool TemBatata() => Itens.Any(i => i.Categoria.Contains("Batata"));
+        private bool TemBatata() => Itens.Any(i => i.Categoria.Contains("Acompanhamento", StringComparison.OrdinalIgnoreCase));
 
         /// <summary>
         /// Verifica se o pedido já tem refrigerante
         /// </summary>
-        private bool TemRefrigerante() => Itens.Any(i => i.Categoria.Contains("Refrigerante"));
+        private bool TemRefrigerante() => Itens.Any(i => i.Categoria.Contains("Bebida", StringComparison.OrdinalIgnoreCase));
 
         /// <summary>
         /// Muda o status do pedido com validação de transição

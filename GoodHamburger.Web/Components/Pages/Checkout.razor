@@ -335,11 +335,7 @@
         StateHasChanged();
         try
         {
-            await OrderService.UpdateOrderAsync(orderDetails.Id, orderDetails.Itens.Select(i => new UpdateOrderItemDto
-            {
-                ItemId = i.ItemId,
-                Quantidade = i.Quantidade
-            }).ToList(), "Cancelado");
+            await OrderService.DeleteOrderAsync(orderDetails.Id);
 
             await CartService.ClearCartAsync();
             await CartService.ClearOrderIdAsync();

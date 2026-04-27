@@ -80,11 +80,7 @@
                             <span>- @_orderDetails.Desconto.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
                         </div>
                     }
-                    <div class="summary-row">
-                        <span>Taxa de Entrega</span>
-                        <span><strong>@CartService.DeliveryFee.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</strong></span>
-                    </div>
-                    <div class="divider"></div>
+                    
                     <div class="total-row">
                         <span>Total</span>
                         <span class="total-amount">@_orderDetails.Total.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
@@ -157,13 +153,7 @@
                         <span>Subtotal</span>
                         <span><strong>@CartService.Subtotal.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</strong></span>
                     </div>
-                    @if (CartService.Discount > 0)
-                    {
-                        <div class="summary-row discount">
-                            <span><i class="bi bi-tag"></i> Desconto</span>
-                            <span>- @CartService.Discount.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</span>
-                        </div>
-                    }
+
                     <div class="summary-row">
                         <span>Taxa de Entrega</span>
                         <span><strong>@CartService.DeliveryFee.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</strong></span>

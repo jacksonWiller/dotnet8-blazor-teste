@@ -15,7 +15,6 @@ Esta tela de checkout foi implementada na aplicação Blazor seguindo fielmente 
 ### 2. **Resumo do Pedido**
 - Subtotal calculado automaticamente
 - Desconto de combo (20%) quando aplicável
-- Taxa de entrega
 - Total final com cálculo dinâmico
 - Tempo estimado de entrega (25-35 min)
 
@@ -80,7 +79,6 @@ Os dados são hardcoded para demonstração:
 - 2 itens no carrinho (1 combo deal, 1 item normal)
 - Subtotal: $59.00
 - Desconto: $11.80 (20%)
-- Taxa de entrega: $3.50
 - Total: $50.70
 
 ## Próximos Passos (Sugestões)

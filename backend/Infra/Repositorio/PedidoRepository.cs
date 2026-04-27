@@ -86,7 +86,11 @@ namespace Infra.Repositorio
                 .ToListAsync();
 
             _dataContext.PedidoItens.RemoveRange(itensAntigos);
-            _dataContext.Pedidos.Update(pedido);
+
+            _dataContext.Entry(pedido).State = EntityState.Modified;
+
+            await _dataContext.PedidoItens.AddRangeAsync(pedido.Itens);
+
             await _dataContext.SaveChangesAsync();
         }
     }

@@ -29,7 +29,6 @@ services:
         sleep 5
         echo 'Executando scripts...'
         PGPASSWORD=postgres psql -h postgres -U postgres -d postgres -f /scripts/migrations.sql
-        PGPASSWORD=postgres psql -h postgres -U postgres -d postgres -f /scripts/insert.sql
         echo 'Scripts executados com sucesso!'
       "
     networks:

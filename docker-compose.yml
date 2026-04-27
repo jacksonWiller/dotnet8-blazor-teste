@@ -36,7 +36,7 @@ services:
 
   api:
     build:
-      context: ./backend/
+      context: ./GoodHamburger.Server/
       dockerfile: Api/Dockerfile
     container_name: api_clientes
     ports:

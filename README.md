@@ -374,9 +374,3 @@ Item (Id, Nome, Descricao, Preco, Tipo, Categoria, UrlImagem, Removido)
 ```
 
 ---
-
-## 👨‍💻 Desenvolvedor
-
-Desenvolvido por **Jackson Willer** como resposta ao teste técnico .NET da **Stgen**.
-
-- GitHub: [@jacksonWiller](https://github.com/jacksonWiller)

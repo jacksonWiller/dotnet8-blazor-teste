@@ -4,7 +4,7 @@
 
 ---
 
-## �️ Telas da Aplicação
+## Telas da Aplicação
 
 Abaixo estão detalhadas todas as telas do sistema, com capturas de tela e os endpoints da API utilizados em cada uma:
 
